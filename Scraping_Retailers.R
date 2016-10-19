@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('rvest', 'xml2', 'dplyr', 'magrittr', 'RSelenium')
+packages <- c('rvest', 'xml2', 'dplyr', 'magrittr', 'RSelenium', 'repmis')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -12,11 +12,17 @@ for (p in packages) {
     require(p, character.only=TRUE)
   }
 }
+# Loads packages rvest, xml2, dplyr, margrittr, {RSelenium, RCurl, bitops, XML}, repmis
+
 # Creating a BibTex file
 repmis::LoadandCite(packages, file = 'RpackageCitations.bib')
 
 # Removing from global environment for better readability
 rm(packages, p, wrkdir)
+
+# PhantomJS is a headless WebKit scriptable with a JavaScript API. 
+
+# ftp://cran.r-project.org/pub/R/web/packages/RSelenium/vignettes/RSelenium-headless.html
 
 # Start the pJS (which is?; can it be done without the application in the folder?)
 pJS <- phantom()
