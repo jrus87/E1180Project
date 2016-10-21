@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('rvest', 'xml2', 'dplyr', 'magrittr', 'RSelenium', 'repmis')
+packages <- c('rvest', 'xml2', 'dplyr', 'magrittr', 'RSelenium', 'repmis', 'psych', 'doBy')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -38,11 +38,6 @@ Retailer.text<-Retailer.html%>%
 Retailer.table<-matrix(Retailer.text,byrow=TRUE)
 remDr$close()
 pJS$stop()
-
-# Subset 5 to make it more readable in quest for function
-#Retailer.table <- Retailer.table[sample(1:nrow(Retailer.table), 2, replace=FALSE),]
-#Retailer.table
-# Now use license numbers (list of 311) as reference point?
 
 #####
 # Retailers
@@ -100,9 +95,9 @@ RetailerInfo <- lapply(RetailerURLs, FUN=function(URLLink){
 Retailer <- do.call(rbind, RetailerInfo)
 head(Retailer)
 
-# plus count via plyr? = frequency count
-table(unique(Retailer$RetailerURLLink))
-table(Retailer$County)
+###
+# Data Cleaning
+###
 
 # Get rid of $ signs
 Retailer <- mutate(Retailer, Sales=as.character(Sales))
@@ -115,3 +110,56 @@ head(Retailer)
 Retailer$Sales <- as.numeric(gsub(",","", Retailer$Sales))
 Retailer$ExciseTax <- as.numeric(gsub(",","", Retailer$ExciseTax))
 head(Retailer)
+
+# Save Data Frame
+write.table(Retailer, file="Retailer.txt", sep = ",")
+Retailer <- read.table("Retailer.txt", sep=",")
+
+###
+# Collapse Data
+###
+
+# Descriptive Statistic per Name
+describeBy(Retailer, Retailer$Name)
+
+# Get sum for all individual Retailers
+summedup_Link <- summaryBy(Sales + ExciseTax ~ RetailerURLLink, data=Retailer,
+                           FUN=function(x) {c(sum=sum(x))})
+# either now match the names to the urllinks using merge from Retailer or find the right ones and correct for all
+summedup_Name <- summaryBy(Sales + ExciseTax ~ Name, data=Retailer,
+                           FUN=function(x) {c(sum=sum(x))})
+
+
+###
+# Data Issues
+###
+
+head(Retailer, n=10)
+table(!duplicated(Retailer$Name)) # why only 283 (data should have 311 observations)
+table(!duplicated(Retailer$RetailerURLLink)) # 311 unique URLLinks
+
+Retailer$NameDup <- NA
+Retailer$NameDup[!duplicated(Retailer$Name)] <- 1
+RetailerName <- Retailer[which(Retailer$NameDup=="1"),]
+RetailerName$NameDup <- NULL
+
+Retailer$LinkDup <- NA
+Retailer$LinkDup[!duplicated(Retailer$RetailerURLLink)] <- 1
+RetailerLink <- Retailer[which(Retailer$LinkDup=="1"),]
+RetailerLink$NameDup <- NULL
+RetailerLink$LinkDup <- NULL
+
+total <- merge(RetailerLink, RetailerName, by="Name", all=TRUE)
+
+table(!duplicated(total$Name))
+which(duplicated(total$Name))
+##[1]  17  26  35  36  60  72  76  82  98 119 133 152 153 154 161
+##[16] 220 224 235 263 264 269 272 273 274 276 277 292 309
+
+# We have 28 times the same name for different license numbers
+total[17,]
+which(total$Name=="8 BALL BARRISTER, LLC")
+which(Retailer$Name=="8 BALL BARRISTER, LLC")
+Retailer[c(1056, 2520),"RetailerURLLink"]
+# Thus either correct those 28 by adding their County name in title or 
+# use RetailerURLLink for future reference
