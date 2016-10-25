@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('rvest', 'xml2', 'dplyr', 'magrittr', 'RSelenium', 'repmis', 'psych', 'doBy')
+packages <- c('rvest', 'xml2', 'dplyr', 'magrittr', 'RSelenium', 'repmis', 'psych', 'doBy', 'ggplot2')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -129,6 +129,42 @@ summedup_Link <- summaryBy(Sales + ExciseTax ~ RetailerURLLink, data=Retailer,
 summedup_Name <- summaryBy(Sales + ExciseTax ~ Name, data=Retailer,
                            FUN=function(x) {c(sum=sum(x))})
 
+retailer2014 <- Retailer[which(Retailer$Month=="All-2014"),]
+retailer2015 <- Retailer[which(Retailer$Month=="All-2015"),]
+
+retailer2016 <- Retailer[which(Retailer$Month!="All-2015"),]
+
+
+Tax2014 <- summaryBy(Sales + ExciseTax ~ County, data=retailer2014,
+                     FUN=function(x) {c(sum=sum(x))})
+Tax2015 <- summaryBy(Sales + ExciseTax ~ County, data=retailer2015,
+                           FUN=function(x) {c(sum=sum(x))})
+Tax2016 <- summaryBy(Sales + ExciseTax ~ Month, data=retailer2016,
+                     FUN=function(x) {c(sum=sum(x))})
+Tax2016 <- Tax2016[which(Tax2016$Month!="All-2014"),]
+
+
+# 2014 financial data
+sum(Tax2014$Sales.sum)/1e+6 # 29.21 m US Dollar
+sum(Tax2014$ExciseTax.sum)/1e+6 # 9.74 m US Dollar
+(sum(Tax2014$ExciseTax.sum)/sum(Tax2014$Sales.sum)) # 1/3
+
+# 2015 financial data
+sum(Tax2015$Sales.sum)/1e+6 # 309.87 m. US Dollar
+sum(Tax2015$ExciseTax.sum)/1e+6 # 110.97 m US Dollar
+(sum(Tax2015$ExciseTax.sum)/sum(Tax2015$Sales.sum)) # 35,8 %
+
+# 2016 financial data # 2014 data still in there
+sum(Tax2016$Sales.sum)/1e+6 # 509.61 m. US Dollar (9 months)
+sum(Tax2016$ExciseTax.sum)/1e+6 # 197.48 m US Dollar (9 months)
+(sum(Tax2016$ExciseTax.sum)/sum(Tax2016$Sales.sum)) # 36,8 %
+
+Tax2016$Month <- as.character(Tax2016$Month)
+str(Tax2016$ExciseTax.sum)
+
+graph <- ggplot(Tax2016, aes(Month, ExciseTax.sum)) +
+  geom_point()
+graph # order the months correct
 
 ###
 # Data Issues
