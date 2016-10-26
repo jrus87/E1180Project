@@ -1,12 +1,23 @@
 ---
-title: "Untitled"
+title: Testing the Effects of Marijuana Legalization on Crime and Other Drug Usage
+  in Seattle and Denver
 author: "Benjamin Gaiser and Jeremy Russell"
 date: "26 October 2016"
-output: html_document
-bibliography: bibliography.bib
+output: pdf_document
+bibliography: LiteratureReviewCitations_SecondAssignment.bib
 ---
+**Research Question:**  
+Our research concerns the effects of marijuana legalization in two U.S. states. In 2012, Colorado and Washington legalized recreational marijuana use; and in 2014 Oregon and Alaska followed suit. This November, five other states (Arizona, California, Maine, Massachusetts and Nevada) will consider legalizing the recreational use of marijuana, while four others (Arkansas, Florida, Montana and North Dakota) will decide on medical marijuana initiatives [@bagri2016]. Opponents of legalization claim legalization leads to an increase in marijuana and other drug use, "increases crime, diminishes traffic safety, harms public health, and lowers teen educational achievement," while advocates "think legalizationr educes crime, raises tax revenue, lowers criminal justice expenditures, improves public health, bolsters traffic safety, and stimulates the economy." As researchers have pointed out though, until now these claims have largely gone unexamined [@dills2016dose]. This recent study concludes that evidence for either side's arguments is lacking, and "the absence of significant adverse consequences is especially striking given the somtimes dire predictions made by legalization opponents." We would like to test the hypothesis that legalization does not significantly increase crime or other drug usage. We will look more closely at Seattle and Denver to test this.
 
-# References
+**Literature Review:**  
+Given the general lack of reliable, empirical research on the topic in relation to Washington and Colorado especially, we draw on the results of the Cato Institute's report as it is both recent and highly comparative in nature. Thus, we hope to contribute to the growing body of research on marijuana legalization and policy outcomes. Most research seems to run in a more medical vein. Authors writing for the RAND Corporation argue that it is too soon to adequately address the repurcusions of legalization; or more accurately, that since more data is needed, policy makers must acknowledge the need to work flexibly with issues at hand since what evidence we have is remarkably varying based on which country, state or metro region we analyze [@caulkins2015options]. Another study focuses on the knowledge shared between parents and adolescents from lower-income families and the need for public health campaigns to raise awareness after legalization in Washington state [@mason2015washington]. Researchers found that legalization had a minimal effect on additudes regarding marijuana; but that after legalization, those who had previously used marijuana before legalization viewed marijuana more favorably than non-users.
+
+
+**Data and Research Methodology:** 
+
+
+
+
+#### References
 
 ---
- @kahle2013ggmap
