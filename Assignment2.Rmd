@@ -14,7 +14,7 @@ Given the general lack of reliable, empirical research on the topic in relation 
 
 
 **Data and Research Methodology:** 
-We use two main data sources: the first is the website for the 'Washington Initiative 502,' [http://www.502data.com] the initiative to legalize recreational use; and the second is a .csv file from the city of Denver's Open Data Catalog [https://www.denvergov.org/opendata/dataset/city-and-county-of-denver-crime]. The former lists the names and locations of producers/processors in the state and of retailers including YTD sales and tax revenue. Since the 502data site is scripted in Java, we use the phantomjs() function in the RSelenium package [@R-RSelenium], which does not work on a Mac. For Denver's data, we downloaded the .csv file and used the readr package [@R-readr] to load the data.
+We use two main data sources: the first is the website for the 'Washington Initiative 502,' [http://www.502data.com] the initiative to legalize recreational use; and the second is a .csv file from the city of Denver's Open Data Catalog [https://www.denvergov.org/opendata/dataset/city-and-county-of-denver-crime]. The former lists the names and locations of producers/processors in the state and of retailers including YTD sales and tax revenue. Since the 502data site is scripted in Java, we use the phantomjs() function in the RSelenium package [@R-RSelenium], which does not work on a Mac. For Denver's data, we downloaded the .csv file and used the readr package [@R-readr] to load the data. Altogether, we will have data on marijuana for the state of Washington, crime and marijuana for Seattle, and crime for Denver. We also hope to supplement this data with U.S. census data on socio-economic factors per district or county as well.
 
 
 \pagebreak
