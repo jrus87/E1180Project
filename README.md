@@ -5,7 +5,7 @@
 This is the repository that [Jeremy](https://github.com/jrus87) and [Ben](https://github.com/BenjaminGaiser) are using for the assingments for [MPP-E1180: Introduction to Collaborative Social Science Data Analysis](https://github.com/HertieDataScience) at the Hertie School of Governance. We welcome any feedback or comments, and you can get in touch with us via our GitHub accounts or by submitting a pull request. 
 
 ## Repository
-This repository contains the R code for webscraping, cleaning and analyzing the data we found. Currently we have data on marijuana production and distribution for the state of Washington, crime and marijuana stats for Seattle, and crime for Denver. We also hope to supplement this data with U.S. census data on socio-economic factors per district or county as well.
+This repository contains the R code for webscraping, cleaning and analyzing the data we found. Currently we have data on marijuana production and distribution for the state of Washington, and crime and marijuana stats for Seattle and Denver. We also plan to supplement this data with U.S. census data on socio-economic factors per district/county as well.
 
 ## Assignment
 The [second assignment](https://github.com/HertieDataScience/SyllabusAndLectures/blob/master/README.md) states the following:
