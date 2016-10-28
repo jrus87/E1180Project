@@ -4,7 +4,7 @@ title: Testing the Effects of Marijuana Legalization on Crime and Other Drug Usa
 author: "Benjamin Gaiser and Jeremy Russell"
 date: "26 October 2016"
 output: pdf_document
-bibliography: LiteratureReviewCitations_SecondAssignment.bib
+bibliography: ./BibTex/LiteratureReviewCitations_SecondAssignment.bib
 ---
 **Research Question:**  
 Our research concerns the effects of marijuana legalization in two U.S. states. In 2012, Colorado and Washington legalized recreational marijuana use; and in 2014 Oregon and Alaska followed suit. This November, five other states (Arizona, California, Maine, Massachusetts and Nevada) will consider legalizing the recreational use of marijuana, while four others (Arkansas, Florida, Montana and North Dakota) will decide on medical marijuana initiatives [@bagri2016]. Opponents of legalization claim legalization leads to an increase in marijuana and other drug use, "increases crime, diminishes traffic safety, harms public health, and lowers teen educational achievement," (citation?) while advocates "think legalization reduces crime, raises tax revenue, lowers criminal justice expenditures, improves public health, bolsters traffic safety, and stimulates the economy." (citation?) As researchers have pointed out though, until now these claims have largely gone unexamined [@dills2016dose]. This recent study concludes that evidence for either side's arguments is lacking, and "the absence of significant adverse consequences is especially striking given the somtimes dire predictions made by legalization opponents." (citation?) We would like to test the hypothesis that legalization does not significantly increase crime or other drug usage. We will look more closely at the two state capitals Seattle and Denver to test this.
