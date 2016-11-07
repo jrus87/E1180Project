@@ -103,7 +103,7 @@ Seattle.Crime.narcotics <- Seattle.Crime[c(narcotics, marijuana, liquor, dui, dr
 table(Seattle.Crime.narcotics$Event.Clearance.Description)
 
 # Write Table
-write.table(Seattle.Crime.narcotics, file="./Data/CrimeSeattleNarcotics.txt", sep = ",")
+write.table(Seattle.Crime.Narcotics,gzfile("./Data/CrimeSeattleNarcotics.gz"))
 
 # Remove 
 rm(Seattle.Crime.narcotics, narcotics, marijuana, liquor, dui, drug.related)
