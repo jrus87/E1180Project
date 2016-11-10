@@ -39,18 +39,18 @@ ProdProc$ExciseTax <- as.numeric(gsub(",","", ProdProc$ExciseTax))
 head(ProdProc, n=4)
 
 # Recoding Months and Years
-ProdProc$Month[ProdProc$Month=="All-2014"] <- "2014"
-ProdProc$Month[ProdProc$Month=="All-2015"] <- "2015"
-ProdProc$Month[ProdProc$Month=="Jan-2016"] <- "2016/01"
-ProdProc$Month[ProdProc$Month=="Feb-2016"] <- "2016/02"
-ProdProc$Month[ProdProc$Month=="Mar-2016"] <- "2016/03"
-ProdProc$Month[ProdProc$Month=="Apr-2016"] <- "2016/04"
-ProdProc$Month[ProdProc$Month=="May-2016"] <- "2016/05"
-ProdProc$Month[ProdProc$Month=="Jun-2016"] <- "2016/06"
-ProdProc$Month[ProdProc$Month=="Jul-2016"] <- "2016/07"
-ProdProc$Month[ProdProc$Month=="Aug-2016"] <- "2016/08"
-ProdProc$Month[ProdProc$Month=="Sep-2016"] <- "2016/09"
-ProdProc$Month[ProdProc$Month=="Oct-2016"] <- "2016/10"
+ProdProc$Month[ProdProc$Month=="All-2014"] <- "2014-12"
+ProdProc$Month[ProdProc$Month=="All-2015"] <- "2015-12"
+ProdProc$Month[ProdProc$Month=="Jan-2016"] <- "2016-01"
+ProdProc$Month[ProdProc$Month=="Feb-2016"] <- "2016-02"
+ProdProc$Month[ProdProc$Month=="Mar-2016"] <- "2016-03"
+ProdProc$Month[ProdProc$Month=="Apr-2016"] <- "2016-04"
+ProdProc$Month[ProdProc$Month=="May-2016"] <- "2016-05"
+ProdProc$Month[ProdProc$Month=="Jun-2016"] <- "2016-06"
+ProdProc$Month[ProdProc$Month=="Jul-2016"] <- "2016-07"
+ProdProc$Month[ProdProc$Month=="Aug-2016"] <- "2016-08"
+ProdProc$Month[ProdProc$Month=="Sep-2016"] <- "2016-09"
+ProdProc$Month[ProdProc$Month=="Oct-2016"] <- "2016-10"
 
 ###
 # Data Issues

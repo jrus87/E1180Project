@@ -1,4 +1,4 @@
-"Name","Month","Sales","ExciseTax","County","Established","RetailerURLLink"
+"Name.Ret","Month.Ret","Sales.Ret","ExciseTax.Ret","County.Ret","Established.Ret","RetailerURLLink"
 "1","MAIN STREET MARIJUANA","Oct-2016","$1,347,938","$498,737","Clark County","Retailer since Jul 2014","http://www.502data.com/license/414876"
 "2","MAIN STREET MARIJUANA","Sep-2016","$1,393,531","$515,606","Clark County","Retailer since Jul 2014","http://www.502data.com/license/414876"
 "3","MAIN STREET MARIJUANA","Aug-2016","$1,350,125","$499,546","Clark County","Retailer since Jul 2014","http://www.502data.com/license/414876"

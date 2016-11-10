@@ -54,39 +54,39 @@ ptm <- proc.time()
 RetailerInfo <- lapply(RetailerURLs, FUN=function(URLLink){
   Retailer <- read_html(URLLink)
 
-  Name <- Retailer %>%
+  Name.Ret <- Retailer %>%
     html_nodes("h1") %>%
     html_text() %>%
     as.character()
     
-  Month <- Retailer %>%
+  Month.Ret <- Retailer %>%
     html_nodes("td:nth-child(1)") %>%
     html_text() %>%
     as.character()
   
-  Sales <- Retailer %>%
+  Sales.Ret <- Retailer %>%
     html_nodes("td:nth-child(2)") %>%
     html_text() %>%
     as.character()
   
-  ExciseTax <- Retailer %>%
+  ExciseTax.Ret <- Retailer %>%
     html_nodes("td:nth-child(3)") %>%
     html_text() %>%
     as.character()
   
-  County <- Retailer %>%
+  County.Ret <- Retailer %>%
     html_nodes(".text-muted a") %>%
     html_text() %>%
     as.character()
   
-  Established <- Retailer %>%
+  Established.Ret <- Retailer %>%
     html_nodes(".text-muted + h4") %>%
     html_text() %>%
     as.character()
   
   RetailerURLLink <- URLLink
   
-  Checker = data.frame(Name, Month, Sales, ExciseTax, County, Established, RetailerURLLink)
+  Checker = data.frame(Name.Ret, Month.Ret, Sales.Ret, ExciseTax.Ret, County.Ret, Established.Ret, RetailerURLLink)
   
 }) 
 # Stop timer

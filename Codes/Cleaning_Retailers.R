@@ -27,40 +27,40 @@ Retailer <- read.table("./Data/Retailer.txt", sep=",", stringsAsFactors = FALSE)
 ###
 
 # Get rid of $ signs
-Retailer <- mutate(Retailer, Sales=sapply(strsplit(Retailer$Sales, split='$', fixed=TRUE), function(x) (x[2])))
-Retailer <- mutate(Retailer, ExciseTax=sapply(strsplit(Retailer$ExciseTax, split='$', fixed=TRUE), function(x) (x[2])))
+Retailer <- mutate(Retailer, Sales.Ret=sapply(strsplit(Retailer$Sales.Ret, split='$', fixed=TRUE), function(x) (x[2])))
+Retailer <- mutate(Retailer, ExciseTax.Ret=sapply(strsplit(Retailer$ExciseTax.Ret, split='$', fixed=TRUE), function(x) (x[2])))
 head(Retailer, n=4)
 
-# Make Sales and Excise Tax into numerics
-Retailer$Sales <- as.numeric(gsub(",","", Retailer$Sales))
-Retailer$ExciseTax <- as.numeric(gsub(",","", Retailer$ExciseTax))
+# Make Sales.Ret and Excise Tax into numerics
+Retailer$Sales.Ret <- as.numeric(gsub(",","", Retailer$Sales.Ret))
+Retailer$ExciseTax.Ret <- as.numeric(gsub(",","", Retailer$ExciseTax.Ret))
 head(Retailer, n=4)
 
 # Recoding Months and Years
-Retailer$Month[Retailer$Month=="All-2014"] <- "2014"
-Retailer$Month[Retailer$Month=="All-2015"] <- "2015"
-Retailer$Month[Retailer$Month=="Jan-2016"] <- "2016/01"
-Retailer$Month[Retailer$Month=="Feb-2016"] <- "2016/02"
-Retailer$Month[Retailer$Month=="Mar-2016"] <- "2016/03"
-Retailer$Month[Retailer$Month=="Apr-2016"] <- "2016/04"
-Retailer$Month[Retailer$Month=="May-2016"] <- "2016/05"
-Retailer$Month[Retailer$Month=="Jun-2016"] <- "2016/06"
-Retailer$Month[Retailer$Month=="Jul-2016"] <- "2016/07"
-Retailer$Month[Retailer$Month=="Aug-2016"] <- "2016/08"
-Retailer$Month[Retailer$Month=="Sep-2016"] <- "2016/09"
-Retailer$Month[Retailer$Month=="Oct-2016"] <- "2016/10"
+Retailer$Month.Ret[Retailer$Month.Ret=="All-2014"] <- "2014-12" # /12 indicates all months (important for analysis)
+Retailer$Month.Ret[Retailer$Month.Ret=="All-2015"] <- "2015-12" # /12 indicates all months (important for analysis)
+Retailer$Month.Ret[Retailer$Month.Ret=="Jan-2016"] <- "2016-01"
+Retailer$Month.Ret[Retailer$Month.Ret=="Feb-2016"] <- "2016-02"
+Retailer$Month.Ret[Retailer$Month.Ret=="Mar-2016"] <- "2016-03"
+Retailer$Month.Ret[Retailer$Month.Ret=="Apr-2016"] <- "2016-04"
+Retailer$Month.Ret[Retailer$Month.Ret=="May-2016"] <- "2016-05"
+Retailer$Month.Ret[Retailer$Month.Ret=="Jun-2016"] <- "2016-06"
+Retailer$Month.Ret[Retailer$Month.Ret=="Jul-2016"] <- "2016-07"
+Retailer$Month.Ret[Retailer$Month.Ret=="Aug-2016"] <- "2016-08"
+Retailer$Month.Ret[Retailer$Month.Ret=="Sep-2016"] <- "2016-09"
+Retailer$Month.Ret[Retailer$Month.Ret=="Oct-2016"] <- "2016-10"
 
 ###
 # Data Issues
 ###
 
 # We have 289 unique Retailer Names but 319 unique URLs => i.e. there are multiple shops with the same name
-table(!duplicated(Retailer$Name)) # 289 out of 319
+table(!duplicated(Retailer$Name.Ret)) # 289 out of 319 unique URLs
 table(!duplicated(Retailer$RetailerURLLink)) # 319 
 
 # Create a data frame with unique names
 Retailer$NameDup <- NA
-Retailer$NameDup[!duplicated(Retailer$Name)] <- 1
+Retailer$NameDup[!duplicated(Retailer$Name.Ret)] <- 1
 RetailerName <- Retailer[which(Retailer$NameDup=="1"),]
 RetailerName$NameDup <- NULL
 
@@ -73,22 +73,22 @@ RetailerLink$LinkDup <- NULL
 
 # Get rid of auxillary variables in main data set and superfluous variables in two new data sets
 Retailer$NameDup <- Retailer$LinkDup <- NULL
-RetailerLink$Month <- RetailerLink$Sales <- RetailerLink$ExciseTax <- RetailerLink$Established <- NULL
-RetailerName$Month <- RetailerName$Sales <- RetailerName$ExciseTax <- RetailerName$Established <- NULL
+RetailerLink$Month.Ret <- RetailerLink$Sales.Ret <- RetailerLink$ExciseTax.Ret <- RetailerLink$Established <- NULL
+RetailerName$Month.Ret <- RetailerName$Sales.Ret <- RetailerName$ExciseTax.Ret <- RetailerName$Established <- NULL
 
 # Merge two new data frames to solve the conflicts
-Conflict.Retailer.df <- merge(RetailerLink, RetailerName, by="Name", all=TRUE)
+Conflict.Retailer.df <- merge(RetailerLink, RetailerName, by="Name.Ret", all=TRUE)
 
 # Check which names are duplicated
-table(!duplicated(Conflict.Retailer.df$Name))
-which(duplicated(Conflict.Retailer.df$Name))
+table(!duplicated(Conflict.Retailer.df$Name.Ret))
+which(duplicated(Conflict.Retailer.df$Name.Ret))
 # The following observations have duplicates in their names:
 ##[1]  10 18 27 36 37 61 74  78  84 101 122 136 157 158 159 166 226 230 241 270 271 276 277 280 281 282 284 285 300
 ##[30] 317
 
 # If we examine one of this observation, we can get the different URL links and thus find out differences
 Conflict.Retailer.df[10,] # 365 RECREATIONAL CANNABIS
-which(Retailer$Name=="365 RECREATIONAL CANNABIS")
+which(Retailer$Name.Ret=="365 RECREATIONAL CANNABIS")
 Retailer[c(1370, 2804),"RetailerURLLink"]
 # URLs for 365 RECREATIONAL CANNABIS are: "http://www.502data.com/license/423784" and
 # "http://www.502data.com/license/413310"
@@ -99,13 +99,11 @@ Retailer[c(1370, 2804),"RetailerURLLink"]
 ###
 
 # Subset Conflict.Retailer.df to King County (Seattle) to see if we have the same issue here
-Conflict.KingCounty <- subset(Conflict.Retailer.df, County.x=="King County")
-table(!duplicated(Conflict.KingCounty$Name))
-which(duplicated(Conflict.KingCounty$Name))
+Conflict.KingCounty <- subset(Conflict.Retailer.df, County.Ret.x=="King County")
+table(!duplicated(Conflict.KingCounty$Name.Ret))
+which(duplicated(Conflict.KingCounty$Name.Ret))
 # 5 duplicates in King County: 3, 16, 32, 58, 63
-Conflict.KingCounty[3,] # 365 RECREATIONAL CANNABIS
-which(Retailer$Name=="365 RECREATIONAL CANNABIS")
-Retailer[c(1370, 2804),"RetailerURLLink"]
+Conflict.KingCounty[3,] # 365 RECREATIONAL CANNABIS -> same as above
 # URLs for 365 RECREATIONAL CANNABIS are: "http://www.502data.com/license/423784" and
 # "http://www.502data.com/license/413310"
 
@@ -116,5 +114,5 @@ Retailer[c(1370, 2804),"RetailerURLLink"]
 ###
 # Create a new data set King County for later analysis with crime data and remove data sets that are no longer needed
 ###
-KingCounty.Retailer <- subset(Retailer, County=="King County") # 641 out of 2856 observations (22.44 %) from King County
+KingCounty.Retailer <- subset(Retailer, County.Ret=="King County") # 641 out of 2856 observations (22.44 %) from King County
 rm(Conflict.KingCounty, Conflict.Retailer.df, RetailerLink, RetailerName)
