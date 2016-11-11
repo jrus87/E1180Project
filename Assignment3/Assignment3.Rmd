@@ -1,0 +1,10 @@
+---
+title: "Testing the Effects of Marijuana Legalization on Crime and Other Drug Usage
+  in Seattle"
+author: "Benjamin Gaiser and Jeremy Russell"
+date: "11 November 2016"
+output: pdf_document
+bibliography: ./BibTex/ThirdAssignment.bib
+---
+
+
