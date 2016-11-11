@@ -114,7 +114,7 @@ washington.barplot.e
 rm(Sales2014, Sales2015, Sales2016, ExciseTax2014, ExciseTax2015, ExciseTax2016,
    WA.bar.e, WA.name.e, WA.numbers.e)
 
-# 3. Map 
+# 3. Create a map only for Narcotics and Marijuana related drugs
 Liquour <- which(grepl("LIQUOR", Seattle.Merged$Event.Clearance.Description))
 DUI <- which(grepl("DUI", Seattle.Merged$Event.Clearance.Description))
 Only.Narcotics <- Seattle.Merged[-c(Liquour, DUI),]
@@ -131,5 +131,82 @@ map.seattle_city +
 rm(Liquour, DUI, Only.Narcotics)
 
 # 4. Crime development in Seattle
+# Dissect Crime into three categories
+Liquour <- which(grepl("LIQUOR", Seattle.Merged$Event.Clearance.Description))
+DUI <- which(grepl("DUI", Seattle.Merged$Event.Clearance.Description))
 
+Alcohol <- Seattle.Merged[c(Liquour, DUI),]
+Only.Narcotics <- Seattle.Merged[-c(Liquour, DUI),]
 
+Marijuana <- which(grepl("MARIJUANA", Only.Narcotics$Event.Clearance.Description))
+Weed <- Seattle.Merged[Marijuana,]
+
+# Clean categories before merging into data frame
+AlcoholCrimePerMonth <- as.data.frame(table(Alcohol$Month.Narc))
+which(AlcoholCrimePerMonth$Var1=="2014-01") # observation 41
+AlcoholCrimePerMonth <- AlcoholCrimePerMonth[-c(1:40),2]
+AlcoholCrimePerMonth <- as.character(AlcoholCrimePerMonth)
+
+Only.NarcoticsCrimePerMonth <- as.data.frame(table(Only.Narcotics$Month.Narc))
+which(Only.NarcoticsCrimePerMonth$Var1=="2014-01") # observation 38
+Only.NarcoticsCrimePerMonth <- Only.NarcoticsCrimePerMonth[-c(1:37),2]
+Only.NarcoticsCrimePerMonth <- as.character(Only.NarcoticsCrimePerMonth)
+
+WeedCrimePerMonth <- as.data.frame(table(Weed$Month.Narc))
+which(WeedCrimePerMonth$Var1=="2014-01") # observation 33
+WeedCrimePerMonth <- WeedCrimePerMonth[-c(1:32),2]
+WeedCrimePerMonth <- as.character(WeedCrimePerMonth)
+
+Month <- unique(Seattle.Merged$Month.Narc)
+Month <- Month[order(Month)]
+Month <- as.character(na.omit(Month))
+which(Month=="2014-01") # observation 42
+Month <- Month[-c(1:41)]
+
+AlcGroup <- c("AlcGroup")
+NarcGroup <- c("NarcGroup")
+WeedGroup <- c("WeedGroup")
+
+# Merge data frame
+Crime.lines <- data.frame(AlcoholCrimePerMonth, Only.NarcoticsCrimePerMonth, WeedCrimePerMonth, 
+                          Month, AlcGroup, NarcGroup, WeedGroup, stringsAsFactors = FALSE)
+Crime.lines$AlcoholCrimePerMonth <- as.numeric(Crime.lines$AlcoholCrimePerMonth)
+Crime.lines$Only.NarcoticsCrimePerMonth <- as.numeric(Crime.lines$Only.NarcoticsCrimePerMonth)
+Crime.lines$WeedCrimePerMonth <- as.numeric(Crime.lines$WeedCrimePerMonth)
+
+Crime.lines$AlcoholCrimePerMonth <- log(Crime.lines$AlcoholCrimePerMonth)
+Crime.lines$Only.NarcoticsCrimePerMonth <- log(Crime.lines$Only.NarcoticsCrimePerMonth)
+Crime.lines$WeedCrimePerMonth <- log(Crime.lines$WeedCrimePerMonth)
+
+# Create line graph
+crime.graph <- ggplot(Crime.lines, aes(Month)) +
+  geom_line(aes(y = AlcoholCrimePerMonth, colour ="AlcoholCrimePerMonth", group=AlcGroup)) +
+  geom_line(aes(y = Only.NarcoticsCrimePerMonth, colour ="Only.NarcoticsCrimePerMonth", group=NarcGroup)) +
+  geom_line(aes(y = WeedCrimePerMonth, colour = "WeedCrimePerMonth", group=WeedGroup)) +
+  scale_colour_manual(name="Crime category",
+                      labels=c("Alcohol", "Narcotics", "Weed"),
+                      breaks=c("AlcoholCrimePerMonth", "Only.NarcoticsCrimePerMonth", "WeedCrimePerMonth"),
+                      values=c("orange", "black", "green")) +
+  xlab("Months") + ylab("Natural logarithm of Crime") + 
+  labs(title="Crime development in Seattle, WA") + theme_bw() +
+  theme(axis.text.x = element_text(angle=90))
+crime.graph
+
+rm(AlcoholCrimePerMonth, AlcGroup, Alcohol, Only.NarcoticsCrimePerMonth, Only.Narcotics, WeedCrimePerMonth, WeedGroup, Weed,
+   NarcGroup, AlocholCrimePerMonth, DUI, Group, Liquour, Marijuana, Month, Year)
+
+# 5. Univariate regression
+Marijuana <- which(grepl("MARIJUANA", Seattle.Merged$Event.Clearance.Description))
+Seattle.Merged$WeedCrime <- NA
+Seattle.Merged$WeedCrime[-Marijuana] <- 0
+Seattle.Merged$WeedCrime[Marijuana] <- 1
+
+Seattle.Merged$OtherCrime <- NA
+Seattle.Merged$OtherCrime[-Marijuana] <- 1
+Seattle.Merged$OtherCrime[Marijuana] <- 0
+
+fit <- lm(WeedCrime ~ Est, data=Seattle.Merged)
+summary(fit)
+
+fit2 <- lm(OtherCrime ~ Est, data=Seattle.Merged)
+summary(fit2)
