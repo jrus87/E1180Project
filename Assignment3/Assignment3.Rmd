@@ -4,7 +4,7 @@ title: "Testing the Effects of Marijuana Legalization on Crime and Other Drug Us
 author: "Benjamin Gaiser and Jeremy Russell"
 date: "11 November 2016"
 output: pdf_document
-bibliography: ./BibTex/ThirdAssignment.bib
+bibliography: ThirdAssignment.bib
 ---
 
 **OVERVIEW:**
@@ -37,3 +37,5 @@ Multivariate regression and comparison with Denver to follow in the final analys
 \pagebreak
 
 #### References
+
+---
