@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('dplyr', 'repmis', 'fields', 'ggmap', 'ggplot2')
+packages <- c('dplyr', 'repmis', 'fields', 'ggmap', 'ggplot2', 'stargazer')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {

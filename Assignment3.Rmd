@@ -220,7 +220,7 @@ crime.graph
 ```
 
 **OUTCOMES:**
-As retrieving, cleaning and merging the data took quite some time, our focus was more on descriptive statistics than on inferential. Nevertheless, we have created two variables to do two simple univariate regression upon which we will be able to expand on in our next assignment. WeedCrime is a binary variable and assumes 1 for all crimes related to marijuana and 0 otherwise. OtherCrime is a binary variable that is exactly the flipside. We can see that both times the fact that a retailer was established nearby was highly significant but on a negligible level, thus tentatively supporting the idea that marijuana legalization does not open the gates of Sodom and Gomorrah. Yet, lacking any further control variables, little can be said about this association.
+As retrieving, cleaning and merging the data took quite some time, our focus was more on descriptive statistics than on inferential. Nevertheless, we have created a variable to do a simple univariate regression upon which we will be able to expand on in our next assignment. WeedCrime is a binary variable and assumes 1 for all crimes related to marijuana and 0 otherwise. We can see that the fact that a retailer was established nearby was highly significant but on a negligible level (both in terms of strength of the relationship and the variance explained), thus tentatively supporting the idea that marijuana legalization does not open the gates of Sodom and Gomorrah concerning crime. Yet, lacking any further control variables, little can be said about this association at this point in time.
 
 ```{r univariate, include=FALSE}
 Marijuana <- which(grepl("MARIJUANA", Seattle.Merged$Event.Clearance.Description))
@@ -231,14 +231,14 @@ Seattle.Merged$WeedCrime[Marijuana] <- 1
 Seattle.Merged$OtherCrime <- NA
 Seattle.Merged$OtherCrime[-Marijuana] <- 1
 Seattle.Merged$OtherCrime[Marijuana] <- 0
-library(texreg)
 ```
 
-```{r univariate2, message=FALSE}
+```{r univariate2, message=FALSE, results="asis"}
 fit <- lm(WeedCrime ~ Est, data=Seattle.Merged)
-fit2 <- lm(OtherCrime ~ Est, data=Seattle.Merged)
 
-texreg(list(fit, fit2), booktabs = TRUE, dcolumn = TRUE)
+stargazer::stargazer(fit,
+                     title="Univariate Regression of Crime Incidence",
+                     digits=2, type="latex", header=FALSE)
 ```
 
 
