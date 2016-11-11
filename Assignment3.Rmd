@@ -1,0 +1,249 @@
+---
+title: "Testing the Effects of Marijuana Legalization on Crime and Other Drug Usage
+  in Seattle"
+author: "Benjamin Gaiser and Jeremy Russell"
+date: "11 November 2016"
+output: pdf_document
+bibliography: ThirdAssignment.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**OVERVIEW:**
+
+Building on our work since the second assignment and given time constraints, we decided to focus solely on the city of Seattle, Washington for this third assignment. A full comparative analysis of Seattle and Denver is to come in the final assignment. As mentioned, residents of nine other states in addition to Colorado, Washington, Oregon and Alaska recently voted on measures to legalize either recreational or medicinal cannabis use. California, Maine, Massachusetts and Nevada voted to legalize recreational use, while the outcome in Arizona is still forthcoming. Florida, Arkansas and North Dakota voted to legalize the medicinal use of cannabis, while the outcome in Montana is also forthcoming.
+
+**REPOSITORY:**
+
+This repository contains the R code for web scraping, cleaning and analyzing our data. Currently we have data for marijuana production and distribution in the state of Washington, and crime and marijuana statistics for the city of Seattle. We added U.S. census data to account for socio-economic factors.
+
+**DATA PROCESSES:**
+
+We use the R packages built by [@R-repmis] to construct this PDF. Further packages have been used along the data gathering, cleaning and analysis part and will be cited either there or in the references. 
+
+We began by scraping the data for cannabis retailers and producers separately, using the packages [@R-rvest] and [@R-RSelenium]. The latter builds on a phantomjs ".exe"-file, which coincidentally is not compatible with a Mac. So we ran the code on a Windows and made a simple ".txt" file of the data before cleaning it. After cleaning the data, we made variables for tax, sales and recorded month. This heavily relied on the packages by [@R-dplyr] and [@R-magrittr]. There was a problem with the names of retailers not uniquely identifying retail shops. To uniquely identify the length of our data set, we thus need to look at the unique URLs rather than the names. This is not yet a concern however, because the observations that are affected drop out in our later analysis of Seattle. 
+Next, we subset the data on retailers from Washington into King County; downloaded the Seattle crime data with [@R-jsonlite]; subset this data into narcotics and/or alcohol related data, since we wanted to focus on drug-related crimes; and wrote this information into a zip file, as it has taken quite considerable processing time. We would like to note that we are considering adding data on the effects of legalization on more serious crimes (property and violent crimes) in addition to our current analysis of drug related crimes to more accurately specify the effects of legalization. But for now, this helps us to get a first understanding of the relationship between crime and marijuana legalization. Then we scraped U.S. census data, using an array of different packages cited below in the Reference section [-@R-RCurl], [-@R-RJSONIO], [-@R-gdata], [-@R-acs], [-@R-scales], [-@R-sp], [-@R-rgdal], [-@R-maptools], [-@R-tigris] and determining which variables to include in our analysis; we decided to include (1) high household incomes as a share of all (> $200k), (2) age, (3) race and (4) education. We consulted the [following blog post](http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/) as a reference point for our code. 
+In order to merge all of these data, we need to ensure that we had geospatial data for all of them. For the web-scraped data on retailers in Seattle, we did not have this information. So we have scraped information about the data address from [another site](http://kushtourism.com/washington-recreational-marijuana-retail-map-and-directory/#Seattle). With this we sent a Google API query to determine the latitude and longitude for each using commands from the package by[@R-RJSONIO]. This left us with 15 individual retailers for Seattle for which we have data.
+We then saved the geolocation data as a ".txt" file; created parameters to assess the minimum distance using the package by [@R-fields] between latitude/longitude points between the Seattle.Retailer data frame and the Seattle.Crime.Narcotics data frame, creating the final data frame Seattle.Merged. We then made a binary variable representing from which month onwards a retailer was established. As for the merging of our U.S. census data with the final data frame, we had to make a strong assumption to link the socio-economic characteristics of a district to a geopoint of crime. Our assumption here for the U.S. census data on district-specific crimes is that a perpetrator of some crime is probably more likely to commit that crime in their own neighborhood than to travel far away to do so, but we recognize the limitations of this logic.
+
+
+**DESCRIPTIVE STATISTICS:**
+
+```{r cars, include=FALSE}
+wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project', 
+            '~/Hertie School/Fall 2016/CollaborativeSocialScienceDataAnalysis/CSSR')
+repmis::set_valid_wd(wrkdir)
+rm(wrkdir)
+
+source("./Codes/Cleaning_USCensusData.R")
+```
+
+The graphs that follow are built using the package ggplot2 by [@R-ggplot2]. We used a simple bar chart to show the growth of producers/processors and retailers of cannabis in Seattle between the years 2014-16. Between 2014-15, producers grew rapidly. They surged by 201% (from 185 to 574); between 2015-16, they grew more slowly - by 53% (from 574 to 881). Retailers grew by 130% (from 82 to 189) and 69% (from 189 to 319) respectively between 2014-15 and 2015-16. 
+
+```{r Barplot1, include=FALSE}
+# 1.a Create unique Producers/Processors and Retailers lengths for barplot
+Retailer2014 <- Retailer[which(Retailer$Month=="2014-12"),]
+Retailer2015 <- Retailer[which(Retailer$Month=="2015-12"),]
+Retailer2016 <- Retailer[which(Retailer$Month!="2015-12" & Retailer$Month!="2014-12"),]
+
+Retailer2014.uniq <- as.numeric(length(which(!duplicated(Retailer2014$RetailerURLLink))))
+Retailer2015.uniq <- as.numeric(length(which(!duplicated(Retailer2015$RetailerURLLink))))
+Retailer2016.uniq <- as.numeric(length(which(!duplicated(Retailer2016$RetailerURLLink))))
+
+ProdProc2014 <- ProdProc[which(ProdProc$Month=="2014-12"),]
+ProdProc2015 <- ProdProc[which(ProdProc$Month=="2015-12"),]
+ProdProc2016 <- ProdProc[which(ProdProc$Month!="2015-12" & ProdProc$Month!="2014-12"),]
+
+ProdProc2014.uniq <- as.numeric(length(which(!duplicated(ProdProc2014$Name))))
+ProdProc2015.uniq <- as.numeric(length(which(!duplicated(ProdProc2015$Name))))
+ProdProc2016.uniq <- as.numeric(length(which(!duplicated(ProdProc2016$Name))))
+
+# 1.b Create the barplot
+Year <- as.character(c(2014:2016))
+WA.numbers <- c(ProdProc2014.uniq, ProdProc2015.uniq, ProdProc2016.uniq,
+                     Retailer2014.uniq, Retailer2015.uniq, Retailer2016.uniq)
+WA.name <- c("Producer/Processor", "Producer/Processor", "Producer/Processor",
+                   "Retailer", "Retailer", "Retailer")
+WA.bar <- data.frame(Year, WA.numbers, WA.name, stringsAsFactors = FALSE)
+```
+
+```{r barplot1_2, message=FALSE}
+washington.barplot <- ggplot(WA.bar, aes(x=Year, y=WA.numbers, fill=WA.name)) +
+  geom_bar(stat="identity", colour="black",width=.8, position=position_dodge()) + 
+  theme_bw() + xlab("Year") + ylab("Frequency") + 
+  scale_fill_hue(name="Form of business") +
+  ggtitle("Number of Producers and Processors in WA")
+washington.barplot
+```
+
+Data on sales and tax revenue also show a massive increase over these two years. By 2015, sales revenue leaped by 960% from $29.21 million to $309.86 million, and in 2016, by 77% from $309.86 million to $549.93 million. Tax revenue in 2015 grew by an astounding 1040% from $9.74 million to $110.97 million, but slowed down a bit in 2016, increasing by 83% from $110.97 million to $203.47 million. 
+
+```{r Barplot2, include=FALSE}
+# 2. How many Producers/Processors and Retailers per year for King County
+Sales2014 <- sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2014-12"])/1e+6
+Sales2015 <- sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2015-12"])/1e+6
+Sales2016 <- (sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-01"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-02"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-03"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-04"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-05"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-06"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-07"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-08"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-09"]) +
+                sum(Retailer$Sales.Ret[Retailer$Month.Ret=="2016-10"]))/1e+6
+
+ExciseTax2014 <- sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2014-12"])/1e+6
+ExciseTax2015 <- sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2015-12"])/1e+6
+ExciseTax2016 <- (sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-01"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-02"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-03"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-04"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-05"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-06"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-07"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-08"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-09"]) +
+                    sum(Retailer$ExciseTax.Ret[Retailer$Month.Ret=="2016-10"]))/1e+6
+
+# 1.b Create the barplot
+Year <- as.character(c(2014:2016))
+WA.numbers.e <- c(Sales2014, Sales2015, Sales2016,
+                ExciseTax2014, ExciseTax2015, ExciseTax2016)
+WA.name.e <- c("Sales", "Sales", "Sales",
+             "Excise Tax", "Excise Tax", "Excise Tax")
+WA.bar.e <- data.frame(Year, WA.numbers.e, WA.name.e, stringsAsFactors = FALSE)
+```
+
+```{r barplot2_2, message=FALSE}
+washington.barplot.e <- ggplot(WA.bar.e, aes(x=Year, y=WA.numbers.e, fill=WA.name.e)) +
+  geom_bar(stat="identity", colour="black",width=.8, position=position_dodge()) + 
+  theme_bw() + xlab("Year") + ylab("Amount in Mio. US-Dollars") +
+  ggtitle("Cannabis related Sales and Tax Revenues in WA")
+washington.barplot.e
+```
+
+Next we created a map showing all narcotics-related crimes in green, all retailers in red, and wealth as a heat map where the share of household income was above $200,000+ per year (i.e. the more intensive the colour, the higher the share). As we can see, crime was concentrated in the central area of Seattle, and was not clustered around retailers. Furthermore, the type of crime in our data set does not seem to affect the wealthy areas of Seattle. 
+
+```{r Map, include=FALSE}
+Liquour <- which(grepl("LIQUOR", Seattle.Merged$Event.Clearance.Description))
+DUI <- which(grepl("DUI", Seattle.Merged$Event.Clearance.Description))
+Only.Narcotics <- Seattle.Merged[-c(Liquour, DUI),]
+```
+
+```{r Map2, message=FALSE}
+map.seattle_city <- qmap("seattle", zoom = 11, source="stamen", maptype="toner",
+                         darken = c(.3,"#BBBBBB"))
+map.seattle_city +
+  geom_polygon(data=Seattle.SOE, aes(x=lon,y=lat, group=group, fill=percent, 
+                                     color=muted("blue"), alpha=0.9)) +
+  theme_nothing(legend=FALSE) +
+  scale_fill_gradient2(breaks=pretty_breaks(n=5), 
+                       guide=guide_legend(title="Percent living > $200k", keywidth = 2)) +
+  geom_point(data=Only.Narcotics, aes(x=lon.Narc, y=lat.Narc), 
+             color="dark green", alpha=0.03, size=1.1) +
+  geom_point(data=Seattle.Merged, aes(x=lon.Ret, y=lat.Ret), 
+             color="dark red", size=2) +
+  labs(title = "Narcotic Crime in Seattle")
+```
+
+Lastly, we plot crime development in Seattle, divided into narcotics-related, alcohol-related and weed-related. As one can see from the line graph, they do not seem to show any trend, though weed has a higher variation than the other two variables.
+
+```{r crimeline, include=FALSE}
+# Dissect Crime into three categories
+Liquour <- which(grepl("LIQUOR", Seattle.Merged$Event.Clearance.Description))
+DUI <- which(grepl("DUI", Seattle.Merged$Event.Clearance.Description))
+
+Alcohol <- Seattle.Merged[c(Liquour, DUI),]
+Only.Narcotics <- Seattle.Merged[-c(Liquour, DUI),]
+
+Marijuana <- which(grepl("MARIJUANA", Only.Narcotics$Event.Clearance.Description))
+Weed <- Seattle.Merged[Marijuana,]
+
+# Clean categories before merging into data frame
+AlcoholCrimePerMonth <- as.data.frame(table(Alcohol$Month.Narc))
+which(AlcoholCrimePerMonth$Var1=="2014-01") # observation 41
+AlcoholCrimePerMonth <- AlcoholCrimePerMonth[-c(1:40),2]
+AlcoholCrimePerMonth <- as.character(AlcoholCrimePerMonth)
+
+Only.NarcoticsCrimePerMonth <- as.data.frame(table(Only.Narcotics$Month.Narc))
+which(Only.NarcoticsCrimePerMonth$Var1=="2014-01") # observation 38
+Only.NarcoticsCrimePerMonth <- Only.NarcoticsCrimePerMonth[-c(1:37),2]
+Only.NarcoticsCrimePerMonth <- as.character(Only.NarcoticsCrimePerMonth)
+
+WeedCrimePerMonth <- as.data.frame(table(Weed$Month.Narc))
+which(WeedCrimePerMonth$Var1=="2014-01") # observation 33
+WeedCrimePerMonth <- WeedCrimePerMonth[-c(1:32),2]
+WeedCrimePerMonth <- as.character(WeedCrimePerMonth)
+
+Month <- unique(Seattle.Merged$Month.Narc)
+Month <- Month[order(Month)]
+Month <- as.character(na.omit(Month))
+which(Month=="2014-01") # observation 42
+Month <- Month[-c(1:41)]
+
+AlcGroup <- c("AlcGroup")
+NarcGroup <- c("NarcGroup")
+WeedGroup <- c("WeedGroup")
+
+# Merge data frame
+Crime.lines <- data.frame(AlcoholCrimePerMonth, Only.NarcoticsCrimePerMonth, WeedCrimePerMonth, 
+                          Month, AlcGroup, NarcGroup, WeedGroup, stringsAsFactors = FALSE)
+Crime.lines$AlcoholCrimePerMonth <- as.numeric(Crime.lines$AlcoholCrimePerMonth)
+Crime.lines$Only.NarcoticsCrimePerMonth <- as.numeric(Crime.lines$Only.NarcoticsCrimePerMonth)
+Crime.lines$WeedCrimePerMonth <- as.numeric(Crime.lines$WeedCrimePerMonth)
+
+Crime.lines$AlcoholCrimePerMonth <- log(Crime.lines$AlcoholCrimePerMonth)
+Crime.lines$Only.NarcoticsCrimePerMonth <- log(Crime.lines$Only.NarcoticsCrimePerMonth)
+Crime.lines$WeedCrimePerMonth <- log(Crime.lines$WeedCrimePerMonth)
+```
+
+```{r crimeline2, message=FALSE}
+crime.graph <- ggplot(Crime.lines, aes(Month)) +
+  geom_line(aes(y = AlcoholCrimePerMonth, colour ="AlcoholCrimePerMonth", 
+                group=AlcGroup)) +
+  geom_line(aes(y = Only.NarcoticsCrimePerMonth, colour ="Only.NarcoticsCrimePerMonth", 
+                group=NarcGroup)) +
+  geom_line(aes(y = WeedCrimePerMonth, colour = "WeedCrimePerMonth", 
+                group=WeedGroup)) +
+  scale_colour_manual(name="Crime category",
+                      labels=c("Alcohol", "Narcotics", "Weed"),
+                      breaks=c("AlcoholCrimePerMonth", "Only.NarcoticsCrimePerMonth", 
+                               "WeedCrimePerMonth"),
+                      values=c("orange", "black", "green")) +
+  xlab("Months") + ylab("Natural logarithm of Crime") + 
+  labs(title="Crime development in Seattle, WA") + theme_bw() +
+  theme(axis.text.x = element_text(angle=90))
+crime.graph
+```
+
+**OUTCOMES:**
+As retrieving, cleaning and merging the data took quite some time, our focus was more on descriptive statistics than on inferential. Nevertheless, we have created two variables to do two simple univariate regression upon which we will be able to expand on in our next assignment. WeedCrime is a binary variable and assumes 1 for all crimes related to marijuana and 0 otherwise. OtherCrime is a binary variable that is exactly the flipside. We can see that both times the fact that a retailer was established nearby was highly significant but on a negligible level, thus tentatively supporting the idea that marijuana legalization does not open the gates of Sodom and Gomorrah. Yet, lacking any further control variables, little can be said about this association.
+
+```{r univariate, include=FALSE}
+Marijuana <- which(grepl("MARIJUANA", Seattle.Merged$Event.Clearance.Description))
+Seattle.Merged$WeedCrime <- NA
+Seattle.Merged$WeedCrime[-Marijuana] <- 0
+Seattle.Merged$WeedCrime[Marijuana] <- 1
+
+Seattle.Merged$OtherCrime <- NA
+Seattle.Merged$OtherCrime[-Marijuana] <- 1
+Seattle.Merged$OtherCrime[Marijuana] <- 0
+library(texreg)
+```
+
+```{r univariate2, message=FALSE}
+fit <- lm(WeedCrime ~ Est, data=Seattle.Merged)
+fit2 <- lm(OtherCrime ~ Est, data=Seattle.Merged)
+
+texreg(list(fit, fit2), booktabs = TRUE, dcolumn = TRUE)
+```
+
+
+\pagebreak
+
+#### References
+
+---

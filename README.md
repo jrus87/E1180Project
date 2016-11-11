@@ -9,7 +9,7 @@ This repository contains the R code for webscraping, cleaning and analyzing the 
 
 ## Assignment
 The [second assignment](https://github.com/HertieDataScience/SyllabusAndLectures/blob/master/README.md) states the following:
->The second pair assignment is a proposal for your Collaborative Research Project. It is an opportunity for you to layout your collaborative research paper question, justify why it is interesting, provide basic literature review (properly cited using BibTeX), and identify data sources/methodologies that you can access to help answer your question. You will also demonstrate your understanding of literate programming technologies. Deadline 28 October, 2,000 words maximum, 10% of final grade.
+>In the third pair assignment you will gather web based data from at least two sources, merge the data sets, conduct basic descriptive and (some) inferential statistics on the data to address a relevant research question and briefly describe the results including with dynamically generated tables and figures. Students are encouraged to access data and perform statistical analyses with an eye to answering questions relevant for their Collaborative Research Project. Deadline 11 November, the write up should be 1,500 words maximum and use literate programming, 10% of final grade..
 
 ## Research 
 For the assignment, we briefly outline our research question, reference relevant literature on the topic, and describe our data and research methodology.
