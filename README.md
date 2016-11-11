@@ -1,5 +1,5 @@
-# Second Pair Assignment by Ben Gaiser & Jeremy Russell
-28 October 2016
+# Third Pair Assignment by Ben Gaiser & Jeremy Russell
+11 November 2016
 
 ## Overview
 This is the repository that [Jeremy](https://github.com/jrus87) and [Ben](https://github.com/BenjaminGaiser) are using for the assingments for [MPP-E1180: Introduction to Collaborative Social Science Data Analysis](https://github.com/HertieDataScience) at the Hertie School of Governance. We welcome any feedback or comments, and you can get in touch with us via our GitHub accounts or by submitting a pull request. 
@@ -8,7 +8,7 @@ This is the repository that [Jeremy](https://github.com/jrus87) and [Ben](https:
 This repository contains the R code for webscraping, cleaning and analyzing the data we found. Currently we have data on marijuana production and distribution for the state of Washington, and crime and marijuana stats for Seattle and Denver. We also plan to supplement this data with U.S. census data on socio-economic factors per district/county as well.
 
 ## Assignment
-The [second assignment](https://github.com/HertieDataScience/SyllabusAndLectures/blob/master/README.md) states the following:
+The [third assignment](https://github.com/HertieDataScience/SyllabusAndLectures/blob/master/README.md) states the following:
 >In the third pair assignment you will gather web based data from at least two sources, merge the data sets, conduct basic descriptive and (some) inferential statistics on the data to address a relevant research question and briefly describe the results including with dynamically generated tables and figures. Students are encouraged to access data and perform statistical analyses with an eye to answering questions relevant for their Collaborative Research Project. Deadline 11 November, the write up should be 1,500 words maximum and use literate programming, 10% of final grade..
 
 ## Research 
