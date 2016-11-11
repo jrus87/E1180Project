@@ -1,3 +1,6 @@
+# Clean both Retailer and Producer/Processor Data
+source("./Codes/Cleaning_Analysis_Seattle.R")
+
 # Finding the hundred building blocks to merge the data from Seattle Retailers with
 x3 <- aggregate(cbind(lon, lat) ~ GEOID, 
                 data=Seattle.SOE, FUN=function(x) mean(range(x)))
@@ -35,10 +38,9 @@ d <- d[,-1]
 d
 # Merge Addresses for narcotics with normal addresses
 Seattle.SOE <- inner_join(Seattle.SOE, d, by="GEOID")
-sub.Seattle.SOE <- Seattle.SOE[,c(7:8)]
 
 # Merge also by Month
-Seattle.Merged <- merge(Seattle.Merged, sub.Seattle.SOE, by="Address.Narc", all=TRUE)
+Seattle.Merged <- merge(Seattle.Merged, Seattle.SOE, by="Address.Narc", all=TRUE)
 
 # Remove 
-rm(c, d, x3, x4, loop2, value4)
+rm(c, d, x3, x4, loop2, value2)

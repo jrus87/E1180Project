@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('dplyr', 'repmis', 'ggmap', 'ggplot2', 'geosphere', 'fields', 'lubridate')
+packages <- c('dplyr', 'repmis', 'fields', 'ggmap', 'ggplot2')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -30,8 +30,8 @@ source("./Codes/Cleaning_ProdProc.R")
 Seattle.Retailer <- read.table("./Data/Location.txt", sep=",", stringsAsFactors = FALSE) 
 # Seattle.Crime.Narcotics is not sourced, as the data frame is too large; if big picture needed, then source it
 Seattle.Crime.Narcotics <- read.table(gzfile("./Data/CrimeSeattleNarcotics.gz"),row.names=1)
-source("./Codes/US Census Data.R") # still need to subset to GEOIDs of Seattle (to have only relevant data)
-# US Census Data for Seattle # merged with seattle.crime (and .narcotics)
+source("./Codes/Scraping_USCensusData.R") 
+
 
 # Finding the hundred building blocks to merge the data from Seattle Retailers with
 x1 <- aggregate(cbind(lon.Ret, lat.Ret) ~ Address.Ret, data=Seattle.Retailer, FUN=function(x) mean(range(x)))

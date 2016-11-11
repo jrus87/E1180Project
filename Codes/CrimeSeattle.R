@@ -5,6 +5,7 @@
 
 
 library(jsonlite)
+library(gdata) # for the trim function
 
 options(max.print = 30)
 getOption("max.print")
@@ -16,7 +17,6 @@ SeattleCrime<-SeattleCrimeRaw[['data']]
 SeattleCrime
 
 # Assemble the data frame: extracting all the variables (except the geography)
-library(gdata) # for the trim function
 
 grabInfo<-function(var){
   print(paste("Variable", var, sep=" "))  
