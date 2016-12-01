@@ -36,6 +36,8 @@ Relevance:
 
 
 
+
+
 ```
 Error in cowplot::plot_grid(washington.barplot, washington.barplot.e,  : 
   object 'washington.barplot' not found

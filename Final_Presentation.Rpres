@@ -44,6 +44,20 @@ cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
 
 Analysis:
 ========================================================
+```{r, echo=FALSE}
+Map1 <- qmap("seattle", zoom = 11, source="google", maptype="roadmap")
+Map2 <- qmap("seattle", zoom = 12, source="google", maptype="roadmap")
+Map2 <- scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
+  geom_point(data=CrimeOct2016, aes(x=lon, y=lat, colour = factor(Crime)), alpha=0.75, size=1.1) +
+  geom_point(data=Seattle.Crime.Analysis, aes(x=lon.Ret, y=lat.Ret), color="dark red", size=3) +
+  labs(colour = "Crime Categories Oct 2016")
+
+Map3 <- qmap("seattle", zoom = 13, source="google", maptype="roadmap")
+Map3 <- scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
+  geom_point(data=CrimeOct2016, aes(x=lon, y=lat, colour = factor(Crime)), alpha=0.75, size=1.1) +
+  geom_point(data=Seattle.Crime.Analysis, aes(x=lon.Ret, y=lat.Ret), color="dark red", size=3) +
+  labs(colour = "Crime Categories Oct 2016")
+```
 
 Concluding Remarks:
 ========================================================
