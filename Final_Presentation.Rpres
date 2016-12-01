@@ -1,0 +1,64 @@
+The Effects of Marijuana Legalization on Crime and Other Drug Usage in Seattle
+========================================================
+author: Benjamin Gaiser and Jeremy Russell
+date: 2 November 2016
+autosize: true
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE)
+```
+
+Outline of Presentation:
+========================================================
+Introduction
+
+Research 
+
+Relevance
+
+Analysis
+
+Concluding Remarks
+
+
+```{r, echo=FALSE}
+wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project', 
+            '~/Users/jeremyrussell/Hertie School/Fall 2016/CollaborativeSocialScienceDataAnalysis/E1180Project')
+repmis::set_valid_wd(wrkdir)
+rm(wrkdir)
+```
+
+
+Brief Introduction:
+========================================================
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+Relevance:
+========================================================
+```{r, echo=FALSE}
+cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
+```
+
+
+Analysis:
+========================================================
+
+Concluding Remarks:
+========================================================
+
+
+Slide With Code
+========================================================
+
+```{r}
+summary(cars)
+```
+
+Slide With Plot
+========================================================
+
+```{r, echo=FALSE}
+plot(cars)
+```
