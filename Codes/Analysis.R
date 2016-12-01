@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('dplyr', 'repmis', 'fields', 'cowplot', 'ggmap', 'ggplot2', 'stargazer', 'scales', 'MatchIt')
+packages <- c('dplyr', 'repmis', 'fields', 'cowplot', 'ggmap', 'ggplot2', 'stargazer', 'scales', 'doBy')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -14,16 +14,14 @@ for (p in packages) {
 }
 
 # Creating a BibTex file
-repmis::LoadandCite(packages, file = './BibTex/RpackageCitations_Analysis.bib')
+repmis::LoadandCite(packages, file = './BibTex/Analysis.bib')
 
 # Removing from global environment for better readability
 rm(packages, p, wrkdir)
 
 # Load Data # more efficient than source??? do i need soe analysis
-source("./Codes/Third Step - Plot Preparation/PlotsPreparation.R") 
+source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R") 
 
-# Analysis_Washington State has to be renamed (where do categories come from?)
-# how it the per 1000 calculated
 
 ###
 # Descriptive Statistics
@@ -45,21 +43,17 @@ cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
 
 # Map   
 
-  # Map 1 represents all crime for October 2016 as well as our Retailer positions
-Map1 <- qmap("seattle", zoom = 11, source="google", maptype="roadmap")
-
-# points in legend plus points colour
 Map2 <- qmap("seattle", zoom = 12, source="google", maptype="roadmap")
-Map2 <- scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
+Map2 <- Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
   geom_point(data=CrimeOct2016, aes(x=lon, y=lat, colour = factor(Crime)), alpha=0.75, size=1.1) +
   geom_point(data=Seattle.Crime.Analysis, aes(x=lon.Ret, y=lat.Ret), color="dark red", size=3) +
-  labs(colour = "Crime Categories Oct 2016")
+  labs(colour = "Crime Categories Oct 2016") + guides(colour = guide_legend(override.aes = list(alpha = 1)))
 
 Map3 <- qmap("seattle", zoom = 13, source="google", maptype="roadmap")
-Map3 <- scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
+Map3 <- Map3 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
   geom_point(data=CrimeOct2016, aes(x=lon, y=lat, colour = factor(Crime)), alpha=0.75, size=1.1) +
   geom_point(data=Seattle.Crime.Analysis, aes(x=lon.Ret, y=lat.Ret), color="dark red", size=3) +
-  labs(colour = "Crime Categories Oct 2016")
+  labs(colour = "Crime Categories Oct 2016") + guides(colour = guide_legend(override.aes = list(alpha = 1)))
 
 # Line graph
 
@@ -125,10 +119,10 @@ Box1
 #cowplot::plot_grid(Box1, Box2, labels=c("",""))
 
 # 2. By specific crime category => maybe make several barplots next to each other
-t.test(log(Seattle.Crime.Analysis$AlcCrime)~Seattle.Crime.Analysis$Established) # significant but almost irrelevant
+t.test(log(Seattle.Crime.Analysis$AlcCrime)~Seattle.Crime.Analysis$Established) # insignificant
 t.test(log(Seattle.Crime.Analysis$BurCrime)~Seattle.Crime.Analysis$Established) # significant and substantial
 t.test(log(Seattle.Crime.Analysis$MarCrime)~Seattle.Crime.Analysis$Established) # significant and counter-intuitive?
-t.test(log(Seattle.Crime.Analysis$NarcCrime)~Seattle.Crime.Analysis$Established) # insignificant
+t.test(log(Seattle.Crime.Analysis$NarcCrime)~Seattle.Crime.Analysis$Established) # significant
 t.test(log(Seattle.Crime.Analysis$OtherCrime)~Seattle.Crime.Analysis$Established) # signficant and negative
 t.test(log(Seattle.Crime.Analysis$PropCrime)~Seattle.Crime.Analysis$Established) # significant and substantial
 t.test(log(Seattle.Crime.Analysis$ViolCrime)~Seattle.Crime.Analysis$Established) # significant and substantial

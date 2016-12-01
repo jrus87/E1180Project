@@ -1,0 +1,221 @@
+---
+title: "The Effects of Marijuana Legalization on Crime and Other Drug Usage in Seattle"
+author: "Benjamin Gaiser and Jeremy Russell"
+date: "2 December 2016"
+output: beamer_presentation
+fontsize: 10pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## The Effects of Marijuana Legalization on Crime and Other Drug Usage in Seattle
+
+Critics claim that **legalization** leads to an **increase in marijuana and other drug use**, "*increases crime, diminishes traffic safety, harms public health, and lowers teen educational achievement*." 
+
+## Table of Contents
+
+- **Introduction**
+- Research Question
+- Policy Relevance
+- Analysis
+- Conclusion
+
+## Introduction 
+
+- Explain our way to the topic and how we coped with it
+
+## Research Question
+
+- Does legalization of cannabis lead to an increase in crime?
+
+- we look at different levels of crime (Alcohol, Burglary/Theft, Marijuana, Narcotics, Other Drug Related, Property, and Violent Crime)
+
+- due to data restraints we have focused on Seattle instead of WA
+
+- H0: X -> Y as an equation
+
+## Policy Relevance
+
+- Cato paper\vspace{12pt}
+
+- elections
+
+- Rand paper
+
+- cost of drug on war / change of perceptions (cultural shift)
+
+## Analysis - Descriptive Statistics (I)
+
+```{r, include = FALSE}
+source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R")
+```
+
+- business is booming in WA and Sales and Tax Revenues are increasing (in "Analysis.R" you can find the growth pattern)
+
+```{r, echo = FALSE}
+cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
+```
+
+## Analysis - Descriptive Statistics (II)
+
+- explain the map -> concentration of crime in one area. it seems that retailers not associated with crime
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+Map2 <- qmap("seattle", zoom = 12, source="google", maptype="roadmap")
+Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
+  geom_point(data=CrimeOct2016, aes(x=lon, y=lat, colour = factor(Crime)), alpha=0.75, size=1.1) +
+  geom_point(data=Seattle.Crime.Analysis, aes(x=lon.Ret, y=lat.Ret), color="dark red", size=3) +
+  labs(colour = "Crime Categories Oct 2016") + guides(colour = guide_legend(override.aes = list(alpha = 1)))
+```
+
+## Analysis - Descriptive Statistics (III)
+
+- January 2014 -> looks like coding has been different -> but later no statistically significant difference
+- Development varies for each category -> thus natural logarithm (i.e. percentage change month-to-month) -> see next slide
+
+```{r pressure, echo=FALSE}
+crime.graph <- ggplot(Crime.lines, aes(Month, CrimePerThousand, group=Crime, colour = factor(Crime))) 
+crime.graph <- crime.graph + geom_line() +
+  xlab("Months") + ylab("Crime frequency per 1000 inhabitants") + theme_bw() +
+  theme(axis.text.x = element_text(angle=90)) +
+  labs(colour = "Crime Categories") +
+  ggtitle("Crime rates development in Seattle")
+
+crime.graph.log <- ggplot(Crime.lines, aes(Month, log, group=Crime, colour = factor(Crime))) 
+crime.graph.log <- crime.graph.log + geom_line() +
+  xlab("Months") + ylab("Natural logarithm of Crime Rate per 1000 inhabitants") + theme_bw() +
+  theme(axis.text.x = element_text(angle=90)) +
+  labs(colour = "Crime Categories") +
+  ggtitle("Crime rates development in Seattle")
+
+crime.graph
+```
+
+## Analysis - Descriptive Statistics (IV)
+
+- we can see property, burglary and other drug relate crime to change substantially
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+crime.graph.log
+```
+
+## Analysis - Inferential Statistics (I)
+
+- t-test = differences in mean -> significant for all but alcohol related crime
+- different picture depending on the crime rate
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+p <- cowplot::plot_grid(Box3, Box4, Box5, Box6, Box7, Box8, Box9, labels=c(""))
+title <- ggdraw() + draw_label("Development of Crime per 1000 citizens", fontface="bold")
+cowplot::plot_grid(title, p, ncol = 1, rel_heights = c(0.1, 1)) # rel_heights values control title margins
+```
+
+## Analysis - Inferential Statistics (II)
+
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+ps.model <- glm(Established ~ log(CrimePerThousand), data = Seattle.Crime.Analysis,
+                family=binomial,na.action=na.omit)
+#summary(ps.model) # Pscores calculated by logit where outcome = binary treatment status
+# covariates to be chosen that related to both treatment and potential outcomes
+
+# Next calculate the pscores for each observations having a retailer
+Seattle.Crime.Analysis$pscore <- predict(ps.model, newdata = Seattle.Crime.Analysis, type = "response")
+
+# Figure problem from last plot
+par("mar")
+par(mar=c(1,1,1,1))
+
+# mod_match <- matchit(Established ~ CrimePerThousand, method = "nearest", data = Seattle.Crime.Analysis)
+Crime.pscore <- Seattle.Crime.Analysis[Seattle.Crime.Analysis$pscore >= 0.0009535593 & Seattle.Crime.Analysis$pscore <=0.4070721037,]
+```
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+M1 <- lm(log(CrimePerThousand) ~ Established, data = Seattle.Crime.Analysis)
+M2 <- lm(log(CrimePerThousand) ~ Established, data = Crime.pscore)
+```
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+ps.model2 <- glm(Established ~ log(CrimePerThousand) + share_poverty + AgeCat + RaceCat, data = Seattle.Crime.Analysis,
+                family=binomial,na.action=na.omit)
+#summary(ps.model2) # Pscores calculated by logit where outcome = binary treatment status
+# covariates to be chosen that related to both treatment and potential outcomes
+
+# Next calculate the pscores for each observations having a retailer
+Seattle.Crime.Analysis$pscore2 <- predict(ps.model2, newdata = Seattle.Crime.Analysis, type = "response")
+
+# Figure problem from last plot
+par("mar")
+par(mar=c(1,1,1,1))
+
+# mod_match <- matchit(Established ~ CrimePerThousand, method = "nearest", data = Seattle.Crime.Analysis)
+Crime.pscore2 <- Seattle.Crime.Analysis[Seattle.Crime.Analysis$pscore2 >= 0.0003133269 & Seattle.Crime.Analysis$pscore <= 0.1961000,]
+```
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+M3 <- lm(log(CrimePerThousand) ~ Established + share_poverty + AgeCat + RaceCat, data = Seattle.Crime.Analysis)
+M4 <- lm(log(CrimePerThousand) ~ Established + share_poverty + AgeCat + RaceCat, data = Crime.pscore2)
+```
+
+```{r, echo=FALSE, message=FALSE, results="asis"}
+stargazer::stargazer(M1, M2,
+                     title="Analysis of Crime",
+                     digits=2, type="latex", header=FALSE, no.space = TRUE, single.row = TRUE, omit.stat=c("LL","ser","f"))
+```
+
+## Analysis - Inferential Statistics (III)
+
+```{r, echo=FALSE, message=FALSE, results="asis"}
+stargazer::stargazer(M3, M4,
+                     title="Analysis of Crime",
+                     digits=2, type="latex", header=FALSE, no.space = TRUE, single.row = TRUE, omit.stat=c("LL","ser","f"))
+```
+
+## Conclusion (I)
+
+- Model 1 and 3 are non-matched regressions
+- Model 2 and 4 are matched regressions\vspace{12pt}
+- We can see that there is a significant relationship between the establishment and the crime development but once we match similar districts, this drops substantially
+- additionally, the R² becomes much lower also highlighting that the variance explained by the establishment is rather low
+- an explanation for this could be that crime is spatially concentrated and auto-correlated with previous crime levels
+- Retailers might choose not to start up near crime areas (i.e. self-selection bias)
+
+## Conclusion (II)
+
+- Once accounted for GEOID: the point estimation are smaller -> GEOID important
+- Once accounted for Month: the point estimation are higher -> maybe due to the geoid issue (time-trend not as important than spatial?)
+
+- Will not do propensity score matching -> too computationally powerful
+
+
+## Annex (I)
+
+- common support problem with the univariate regression
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# There seems to be a common support problem!
+labs <- paste("Retailer in GEOID established:", c("Yes", "No"))
+Seattle.Crime.Analysis %>%
+  mutate(Established = ifelse(Established == 1, labs[1], labs[2])) %>%
+  ggplot(aes(x = pscore)) +
+  geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
+  facet_wrap(~Established) +
+  xlab("Probability of having a Retailer in GEOID") +
+  theme_bw()
+```
+
+## Annex (II)
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# There seems to be a common support problem!
+labs <- paste("Retailer in GEOID established:", c("Yes", "No"))
+Seattle.Crime.Analysis %>%
+  mutate(Established = ifelse(Established == 1, labs[1], labs[2])) %>%
+  ggplot(aes(x = pscore2)) +
+  geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
+  facet_wrap(~Established) +
+  xlab("Probability of having a Retailer in GEOID") +
+  theme_bw()
+```
