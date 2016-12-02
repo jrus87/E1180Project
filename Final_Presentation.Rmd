@@ -54,6 +54,31 @@ Critics claim that **legalization** leads to an **increase in marijuana and othe
 
 ## Analysis - Descriptive Statistics (I)
 
+------------------------------------------------------------------------
+Variables                       Operationalisation
+------------------------------  ----------------------------------------
+Producer / Processor            Count of Producers and Processors in WA
+Retailer                        Count of Retailers in WA 
+
+Excise Tax                      Sum of Tax paid by Retailers
+Sales                           Sum of Revenue Made by Retailers
+
+Crime Categories                Aggregates of Crime.Event.Clearance.Description from Seattle 911-Incident Database
+
+Established                     0 if no dispensary in district; 1 otherwise
+
+Poverty Rate                    Share of People < $15.000 / year
+
+Average Adults                  0 if less than mean share of adults in district; 1 otherwise
+
+Average Whites                  0 if less than mean share of whites in district; 1 otherwise
+
+GEOID                           U.S. Census Districts
+
+------------------------------------------------------------------------
+
+## Analysis - Descriptive Statistics (II)
+
 ```{r, include = FALSE}
 source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R")
 ```
@@ -64,7 +89,7 @@ source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R")
 cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
 ```
 
-## Analysis - Descriptive Statistics (II)
+## Analysis - Descriptive Statistics (III)
 
 - Crime concentrates in central Seattle. Retailers seem not to be within the vicinty
 
@@ -76,7 +101,7 @@ Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title=
   labs(colour = "Crime Categories Oct 2016") + guides(colour = guide_legend(override.aes = list(alpha = 1)))
 ```
 
-## Analysis - Descriptive Statistics (III)
+## Analysis - Descriptive Statistics (IV)
 
 - Jump in February 2014 could mean that there is a reporting error that flaws our result (not the case)
 - Next slide will show the development in log-scale
@@ -99,7 +124,7 @@ crime.graph.log <- crime.graph.log + geom_line() +
 crime.graph
 ```
 
-## Analysis - Descriptive Statistics (IV)
+## Analysis - Descriptive Statistics (V)
 
 - Crimes in Property, Burglary/Theft, and Other Drugs seem to have changed most
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
@@ -215,7 +240,7 @@ Seattle.Crime.Analysis %>%
   ggplot(aes(x = pscore)) +
   geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
   facet_wrap(~Established) +
-  xlab("Probability of having a Retailer in GEOID") +
+  xlab("Probability of having a Retailer in GEOID (univariate)") +
   theme_bw()
 ```
 
@@ -229,6 +254,22 @@ Seattle.Crime.Analysis %>%
   ggplot(aes(x = pscore2)) +
   geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
   facet_wrap(~Established) +
-  xlab("Probability of having a Retailer in GEOID") +
+  xlab("Probability of having a Retailer in GEOID (multivariate)") +
   theme_bw()
 ```
+
+## Annex (III)
+
+------------------------------------------------------------------------
+Crime Category        M3     M4                      
+------------------  -----  -----
+Alcohol              0.7     NA
+Burglary/Theft       1.5     NA
+Marijuana           -0.5    -2.0 
+Narcotics            0.5     NA
+Other-Drugs          0.5    -0.6 
+Property             1.4     NA
+Violent              1.2     NA
+
+For all p < 0.01
+------------------------------------------------------------------------
