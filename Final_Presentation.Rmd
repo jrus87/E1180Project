@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## The Effects of Marijuana Legalization on Crime and Other Drug Usage in Seattle
 
-Critics claim that **legalization** leads to an **increase in marijuana and other drug use**, "*increases crime, diminishes traffic safety, harms public health, and lowers teen educational achievement*." 
+Critics claim that **legalization** leads to an **increase in marijuana and other drug use**, that it "*increases crime, diminishes traffic safety, harms public health, and lowers teen educational achievement*." 
 
 ## Table of Contents
 
@@ -23,28 +23,34 @@ Critics claim that **legalization** leads to an **increase in marijuana and othe
 - Conclusion
 
 ## Introduction 
+- Wanted to research crime and effects of policymaking on crime\vspace{12pt}
 
-- Explain our way to the topic and how we coped with it
+- Vox's article "Yes Weed Can" discussed upcoming legislation agenda on election day in November\vspace{12pt}
+
+- Also mentioned two studies citing the inconclusive nature of current research given limited data\vspace{12pt}
+
+- Data was indeed hard to find for a number of reasons, but decided on "Washington Initiative 502"\vspace{12pt}
+
 
 ## Research Question
 
-- Does legalization of cannabis lead to an increase in crime?
+- Does legalization of cannabis lead to an increase in crime?\vspace{12pt}
 
-- we look at different levels of crime (Alcohol, Burglary/Theft, Marijuana, Narcotics, Other Drug Related, Property, and Violent Crime)
+- We look at different levels of crime (Alcohol, Burglary/Theft, Marijuana Usage, Other Drug Usage, Property Crime, and Violent Crime)\vspace{12pt}
 
-- due to data restraints we have focused on Seattle instead of WA
-
-- H0: X -> Y as an equation
+- Due to data constraints we focused on Seattle instead of WA\vspace{12pt}
 
 ## Policy Relevance
 
-- Cato paper\vspace{12pt}
+- Cato Institute policy paper, "Dose of Reality: The Effect of State Marijuana Legalizations" published in September\vspace{12pt}
 
-- elections
+- Study covers Colorado, Washington, Oregon, Alaska and the effects of legalization on other drug and alcohol use, health, suicides, road safety, school expulsions\vspace{12pt}
 
-- Rand paper
+- Conclude that data provide little support for strong arguments made by either opponents or supporters\vspace{12pt}
 
-- cost of drug on war / change of perceptions (cultural shift)
+- RAND Corporation paper, "Options and Issues Regarding Marijuana Legalization" published last year\vspace{12pt}
+
+- Authors argue (1) there are other options than usual binary between prohibition and "regulate like alcohol" and (2) it is too soon to judge the repurcusions of legalization and more data needed\vspace{12pt}
 
 ## Analysis - Descriptive Statistics (I)
 
@@ -52,7 +58,7 @@ Critics claim that **legalization** leads to an **increase in marijuana and othe
 source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R")
 ```
 
-- business is booming in WA and Sales and Tax Revenues are increasing (in "Analysis.R" you can find the growth pattern)
+- Business is booming in WA and Sales and Tax Revenues are increasing
 
 ```{r, echo = FALSE}
 cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
@@ -60,7 +66,7 @@ cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
 
 ## Analysis - Descriptive Statistics (II)
 
-- explain the map -> concentration of crime in one area. it seems that retailers not associated with crime
+- Concentration of crime in one area. It seems that retailers not associated with crime
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 Map2 <- qmap("seattle", zoom = 12, source="google", maptype="roadmap")
@@ -72,8 +78,8 @@ Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title=
 
 ## Analysis - Descriptive Statistics (III)
 
-- January 2014 -> looks like coding has been different -> but later no statistically significant difference
-- Development varies for each category -> thus natural logarithm (i.e. percentage change month-to-month) -> see next slide
+- Looks like coding/data processing error in January 2014, but later no statistically significant difference
+- Development varies for each category -> natural logarithm (i.e. percentage change month-to-month) on next slide
 
 ```{r pressure, echo=FALSE}
 crime.graph <- ggplot(Crime.lines, aes(Month, CrimePerThousand, group=Crime, colour = factor(Crime))) 
@@ -95,16 +101,15 @@ crime.graph
 
 ## Analysis - Descriptive Statistics (IV)
 
-- we can see property, burglary and other drug relate crime to change substantially
-
+- We see Property, Burglary/Theft and Other Drug Related change substantially
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 crime.graph.log
 ```
 
 ## Analysis - Inferential Statistics (I)
 
-- t-test = differences in mean -> significant for all but alcohol related crime
-- different picture depending on the crime rate
+- T-test (differences in mean) -> significant for all but alcohol related crime
+- Different picture depending on the crime rate
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 p <- cowplot::plot_grid(Box3, Box4, Box5, Box6, Box7, Box8, Box9, labels=c(""))
@@ -175,24 +180,23 @@ stargazer::stargazer(M3, M4,
 
 ## Conclusion (I)
 
-- Model 1 and 3 are non-matched regressions
+- Model 1 and 3 are non-matched regressions\vspace{12pt}
 - Model 2 and 4 are matched regressions\vspace{12pt}
-- We can see that there is a significant relationship between the establishment and the crime development but once we match similar districts, this drops substantially
-- additionally, the R² becomes much lower also highlighting that the variance explained by the establishment is rather low
-- an explanation for this could be that crime is spatially concentrated and auto-correlated with previous crime levels
+- We can see there is a significant relationship between the establishment and crime development, but once we match similar districts, this drops substantially\vspace{12pt}
+- Additionally, the R? becomes much lower, highlighting that the variance explained by the establishment is rather low\vspace{12pt}
+- An explanation for this could be that crime is spatially concentrated and auto-correlated with previous crime levels\vspace{12pt}
 - Retailers might choose not to start up near crime areas (i.e. self-selection bias)
 
 ## Conclusion (II)
 
-- Once accounted for GEOID: the point estimation are smaller -> GEOID important
-- Once accounted for Month: the point estimation are higher -> maybe due to the geoid issue (time-trend not as important than spatial?)
-
+- Once accounted for GEOID: the point estimation are smaller -> GEOID important\vspace{12pt}
+- Once accounted for Month: the point estimation are higher -> maybe due to the geoid issue (time-trend not as important as spatial?)\vspace{12pt}
 - Will not do propensity score matching -> too computationally powerful
 
 
 ## Annex (I)
 
-- common support problem with the univariate regression
+- Common support problem with the univariate regression
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # There seems to be a common support problem!
