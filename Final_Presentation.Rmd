@@ -16,11 +16,11 @@ Critics claim that **legalization** leads to an **increase in marijuana and othe
 
 ## Table of Contents
 
-- **Introduction**
-- Research Question
-- Policy Relevance
-- Analysis
-- Conclusion
+- Introduction\vspace{12pt}
+- Research Question\vspace{12pt}
+- Policy Relevance\vspace{12pt}
+- Analysis\vspace{12pt}
+- Conclusion\vspace{12pt}
 
 ## Introduction 
 - Wanted to research crime and effects of policymaking on crime\vspace{12pt}
@@ -34,7 +34,7 @@ Critics claim that **legalization** leads to an **increase in marijuana and othe
 
 ## Research Question
 
-- Does legalization of cannabis lead to an increase in crime?\vspace{12pt}
+- ***Does legalization of cannabis lead to an increase in crime?***\vspace{12pt}
 
 - We look at different levels of crime (Alcohol, Burglary/Theft, Marijuana Usage, Other Drug Usage, Property Crime, and Violent Crime)\vspace{12pt}
 
@@ -66,7 +66,7 @@ cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""))
 
 ## Analysis - Descriptive Statistics (II)
 
-- Concentration of crime in one area. It seems that retailers not associated with crime
+- Crime concentrates in central Seattle. Retailers seem not to be within the vicinty
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 Map2 <- qmap("seattle", zoom = 12, source="google", maptype="roadmap")
@@ -78,8 +78,8 @@ Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title=
 
 ## Analysis - Descriptive Statistics (III)
 
-- Looks like coding/data processing error in January 2014, but later no statistically significant difference
-- Development varies for each category -> natural logarithm (i.e. percentage change month-to-month) on next slide
+- Jump in February 2014 could mean that there is a reporting error that flaws our result (not the case)
+- Next slide will show the development in log-scale
 
 ```{r pressure, echo=FALSE}
 crime.graph <- ggplot(Crime.lines, aes(Month, CrimePerThousand, group=Crime, colour = factor(Crime))) 
@@ -101,15 +101,14 @@ crime.graph
 
 ## Analysis - Descriptive Statistics (IV)
 
-- We see Property, Burglary/Theft and Other Drug Related change substantially
+- Crimes in Property, Burglary/Theft, and Other Drugs seem to have changed most
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 crime.graph.log
 ```
 
 ## Analysis - Inferential Statistics (I)
 
-- T-test (differences in mean) -> significant for all but alcohol related crime
-- Different picture depending on the crime rate
+- t-test shows that *treatment* differs with crime category
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 p <- cowplot::plot_grid(Box3, Box4, Box5, Box6, Box7, Box8, Box9, labels=c(""))
@@ -164,35 +163,45 @@ M3 <- lm(log(CrimePerThousand) ~ Established + share_poverty + AgeCat + RaceCat,
 M4 <- lm(log(CrimePerThousand) ~ Established + share_poverty + AgeCat + RaceCat, data = Crime.pscore2)
 ```
 
-```{r, echo=FALSE, message=FALSE, results="asis"}
+```{r, echo=FALSE, fig.height=3.75, fig.width=5, message=FALSE, results="asis"}
 stargazer::stargazer(M1, M2,
                      title="Analysis of Crime",
-                     digits=2, type="latex", header=FALSE, no.space = TRUE, single.row = TRUE, omit.stat=c("LL","ser","f"))
+                     dep.var.labels = c("ln(Crime Rate Per Thousand)"),
+                     covariate.labels = c("Established"),
+                     digits=2, type="latex", header=FALSE, no.space = TRUE, single.row = TRUE, ci=TRUE, ci.level=0.95, omit.stat=c("LL","ser","f"))
 ```
 
 ## Analysis - Inferential Statistics (III)
 
-```{r, echo=FALSE, message=FALSE, results="asis"}
+```{r, echo=FALSE, fig.height=3.75, fig.width=4, message=FALSE, results="asis"}
 stargazer::stargazer(M3, M4,
                      title="Analysis of Crime",
-                     digits=2, type="latex", header=FALSE, no.space = TRUE, single.row = TRUE, omit.stat=c("LL","ser","f"))
+                     dep.var.labels = c("ln(Crime Rate Per Thousand)"),
+                     covariate.labels = c("Established", "Poverty Rate", "> Average Adults", "> Average Whites"),
+                     digits=2, type="latex", header=FALSE, no.space = TRUE, single.row = TRUE, ci=TRUE, ci.level=0.95, omit.stat=c("LL","ser","f"))
 ```
 
 ## Conclusion (I)
 
 - Model 1 and 3 are non-matched regressions\vspace{12pt}
 - Model 2 and 4 are matched regressions\vspace{12pt}
-- We can see there is a significant relationship between the establishment and crime development, but once we match similar districts, this drops substantially\vspace{12pt}
-- Additionally, the R? becomes much lower, highlighting that the variance explained by the establishment is rather low\vspace{12pt}
-- An explanation for this could be that crime is spatially concentrated and auto-correlated with previous crime levels\vspace{12pt}
-- Retailers might choose not to start up near crime areas (i.e. self-selection bias)
+- There is a significant association between Retailers and crime development overall in Seattle. 
+- Once we match similar districts, this becomes negligible though (CI + R²)
+
 
 ## Conclusion (II)
 
-- Once accounted for GEOID: the point estimation are smaller -> GEOID important\vspace{12pt}
-- Once accounted for Month: the point estimation are higher -> maybe due to the geoid issue (time-trend not as important as spatial?)\vspace{12pt}
-- Will not do propensity score matching -> too computationally powerful
+- Qualification I: self-selection bias\vspace{12pt}
+- Qualification II: This analysis is for all crimes without using spatial or temporal dummies\vspace{12pt}
+- Once we account for Month: Point estimates increase\vspace{12pt}
+- Once we account for GEOID: Point estimates decrease\vspace{12pt}
+- Qualification III: Not with propensity score matching (computational restrictions)
 
+## Conclusion (III)
+
+\begin{centering}
+\LARGE{\textbf{Thank you for your attention.}} 
+\end{centering}
 
 ## Annex (I)
 
