@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('dplyr', 'repmis', 'fields', 'ggmap', 'ggplot2')
+packages <- c('dplyr', 'repmis', 'fields', 'ggmap', 'ggplot2', 'doBy')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -133,6 +133,8 @@ rm(a, b, c, d, x1, x2, x3, loop, value, na_Month, na_SOE, na_id, Seattle.Merged,
 ###
 # Data Cleaning
 ###
+
+Seattle.Crime.Analysis <- Seattle.Crime
 
 # 1. Re-name variables to make them more humanly readable
 colnames(Seattle.Crime.Analysis)[colnames(Seattle.Crime.Analysis)=="percenthighincome"] <- "share_over_$200k"
@@ -270,18 +272,15 @@ Seattle.Crime.Analysis$Crime[which(grepl("DUI", Seattle.Crime.Analysis$Event.Cle
 Seattle.Crime.Analysis$Crime[which(grepl("DRUG RELATED", Seattle.Crime.Analysis$Event.Clearance.Description))] <- "Other Drug Related"
 
 # Monthly counts for Crime
-y <- plyr::count(Seattle.Crime.Analysis, c('Crime', 'Month', 'populationTotal', 'GEOID'))
+s1 <- summaryBy(Crime ~ GEOID + Month + Crime, data = Seattle.Crime.Analysis,
+          FUN = function(x) { c(s = sum(x)) } )
+colnames(s1)[colnames(s1)=="Crime.s"] <- "CrimePerMonth" # Crime per Month was erroneously coded in the old version
+Seattle.Crime.Analysis$CrimePerMonth <- NULL
 
-x <- aggregate(cbind(populationTotal, freq) ~ GEOID + Crime + Month, data=y, FUN=function(x) sum(range(x)))
+Seattle.Crime.Analysis <- merge(Seattle.Crime.Analysis, s1, by=c("GEOID", "Month", "Crime"))
 
-x$thousand <- x$populationTotal/1e+3
-x$CrimePerThousand <- x$freq / x$thousand
-x$thousand <- NULL
-x$GEOID <- as.factor(x$GEOID)
-colnames(x)[colnames(x)=="populationTotal"] <- "populationSum"
-
-Seattle.Crime.Analysis <- merge(Seattle.Crime.Analysis, x, by=c("GEOID", "Month", "Crime"))
-colnames(Seattle.Crime.Analysis)[colnames(Seattle.Crime.Analysis)=="freq"] <- "CrimePerMonth"
+Seattle.Crime.Analysis$populationSum <- Seattle.Crime.Analysis$CrimePerThousand <- NULL
+Seattle.Crime.Analysis$CrimePerThousand <- Seattle.Crime.Analysis$CrimePerMonth / Seattle.Crime.Analysis$populationTotal
 
 # make GEOID a factor variable
 Seattle.Crime.Analysis$GEOID <- as.factor(Seattle.Crime.Analysis$GEOID)
