@@ -5,8 +5,7 @@ repmis::set_valid_wd(wrkdir)
 
 # Installing packages
 packages <- c('acs', 'cowplot','plyr', 'dplyr', 'fields', 'gdata', 'ggmap', 'ggplot2', 'jsonlite', 'magrittr', 'maptools',
-              'RCurl', 'repmis', 'rgdal', 'RJSONIO', 'RSelenium', 'rvest', 'scales', 'sp', 'tigris',
-              'stargazer')
+              'RCurl', 'repmis', 'rgdal', 'RJSONIO', 'RSelenium', 'rvest', 'scales', 'sp', 'tigris', 'stargazer', 'readr')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {

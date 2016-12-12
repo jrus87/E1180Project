@@ -1,0 +1,43 @@
+---
+title: The Effects of Marijuana Legalization on Crime and Other Drug Usage in Seattle
+author: Benjamin Gaiser and Jeremy Russell
+date: 16 Decembre 2016
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+bibliography: FinalAnalysis.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction (400 words?)
+
+Lorem ipsum dolor sit amet, oportere pertinacia repudiandae ne mea, eam ne meis eleifend. Ferri splendide tincidunt cum ad, vis mandamus posidonium cu, eos no vitae sententiae honestatis. Tantas inciderint sed eu, aeque sonet efficiantur no sed. Porro debet pertinax per at, ea mea unum vide.
+
+## Literature Review and Policy Relevance (600 words?)
+
+Lorem ipsum dolor sit amet, oportere pertinacia repudiandae ne mea, eam ne meis eleifend. Ferri splendide tincidunt cum ad, vis mandamus posidonium cu, eos no vitae sententiae honestatis. Tantas inciderint sed eu, aeque sonet efficiantur no sed. Porro debet pertinax per at, ea mea unum vide.
+
+## Data Gathering and Methodology (1000 words?)
+
+###Data Gathering
+Our project will be using three main data sets: i) cannabis data on Washington State, ii) crime data on Seattle, WA, and iii) socio-economic data on Seattle, WA. As the policy field of cannabis legalization is a rather nascent field of study, there has been limited availability of reliable data (previous data sources were clouted by the illegality of possession and consumption and thus approximated dark figures). 
+
+Our project has taken advantage of one of the provisions within the ['Washington Initiative 502']('http://www.502data.com'), the initiative that brought about the legalization of cannabis in Washington State, that established disclosure of retailers, processors and producers as well as some general economic data online. The data has been web-scraped using the rvest package [@R-rvest]. As there have been difficulties due to the 502data site being scripted in Java, we additionally needed the ['phantomjs']('http://phantomjs.org/') file to use the RSelenium package [@R-RSelenium] to make the web-scraping possible. 
+
+As the ".exe"-file does not work on Macs and because scraping is time-consuming, we will provide an unaldutered ".txt"-file called "ProdProc" for all producers and processors and one called "Retailer" for retailers. This way we allow for as much reproducibility as possible. The data lists the names and locations of producers/processors in the state and of retailers including YTD sales and tax revenue. For the later analysis, we will constrain the data set to Seattle. 
+The second set of data concerns data on crime. We [scraped the data for Seattle]('https://data.seattle.gov/api/views/7ais-f98f/rows.json?accessType=DOWNLOAD') with the jsonlite package [@R-jsonlite] and formatted it into R-readable format with the gdata package [@R-gdata]. The initial data set is rather large (>80 MB). We have transformed it into a zipped-file called "CrimeSeattle.gz". For the analysis, we cleaned the data so to only contain information about the longitude/latitude, the type of crime and the time it has occurde. For the types of crime we have aggregated individual types into seven broad categories: i) alcohol-related crime (includes Liquor offenses and DUI offenses), ii) burglary/theft, iii) marijuana-related crime, iv) narcotics-related crime, v) other-drug related crimes, vi) property crime, and vii) violent crime (includes armed robberies, assaults, drive by shootings, strong arm robbery and homicides).
+
+The third set of data comes from the U.S. Census data and provides us with socio-economic factors for each district. One limitation is that we, however, only have this data annually and only for 2014. The variables included for this analysis are the share of poverty for each district, the average age level, the prevalence of minority races, as well as the level of education. While these are classic socio-economic factors, the lack of variation means that they will only be useful for the regular OLS regression as well as for the propensity score matching, which means that this set of data will be of limited value overall.^[should find quote for stereotypical soes]
+
+###Methodology
+
+
+\pagebreak
+
+## References
+
+---
