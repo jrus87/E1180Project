@@ -23,6 +23,10 @@ rm(packages, p, wrkdir)
 source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R") 
 
 
+names(Seattle.Crime.Analysis)
+Analysis <- Seattle.Crime.Analysis[,c(1:3,16,28:29,30:33)]
+which(is.na(Analysis))
+
 ###
 # Descriptive Statistics
 ###
@@ -304,4 +308,82 @@ head(confint(M3))
 
 rm(central, Crime.pscore, CrimeAllBut201401, drawn, drawn_sim, mp_coef, mp_vcov, est_range, labs,
    M7.b, pov_range, ps.model)
+
+
+
+# 8. MatchIt (http://stanford.edu/~ejdemyr/r-tutorials-archive/tutorial8.html)
+ps.model <- glm(Established ~ log(CrimePerThousand) + share_poverty + AgeCat + RaceCat + Month, data = Seattle.Crime.Analysis,
+                family=binomial,na.action=na.omit)
+summary(ps.model) # Pscores calculated by logit where outcome = binary treatment status
+# covariates to be chosen that related to both treatment and potential outcomes
+
+# Next calculate the pscores for each observations having a retailer
+Seattle.Crime.Analysis$pscore <- predict(ps.model, newdata = Seattle.Crime.Analysis, type = "response")
+
+# Figure problem from last plot
+par("mar")
+par(mar=c(1,1,1,1))
+
+# There seems to be a common support problem!
+labs <- paste("Retailer in GEOID established:", c("Yes", "No"))
+Seattle.Crime.Analysis %>%
+  mutate(Established = ifelse(Established == 1, labs[1], labs[2])) %>%
+  ggplot(aes(x = pscore)) +
+  geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
+  facet_wrap(~Established) +
+  xlab("Probability of having a Retailer in GEOID") +
+  theme_bw()
+
+# ranges of pscore for D = 0 and D = 1
+range(Seattle.Crime.Analysis$pscore[Seattle.Crime.Analysis$Established==0])
+range(Seattle.Crime.Analysis$pscore[Seattle.Crime.Analysis$Established==1])
+
+# mod_match <- matchit(Established ~ CrimePerThousand, method = "nearest", data = Seattle.Crime.Analysis)
+Crime.pscore <- Seattle.Crime.Analysis[Seattle.Crime.Analysis$pscore >= 0.0003133269 & Seattle.Crime.Analysis$pscore <= 6.732709e-01,]
+summary(Crime.pscore$pscore)
+
+M8 <- lm(log(CrimePerThousand) ~ Established + share_poverty + AgeCat + RaceCat + Month, data = Crime.pscore)
+summary(M8)
+# compare to unrestricted regerssion
+summary(M5)
+
+# 9. MatchIt (http://stanford.edu/~ejdemyr/r-tutorials-archive/tutorial8.html)
+ps.model <- glm(Established ~ log(CrimePerThousand) + share_poverty + AgeCat + RaceCat + GEOID, data = Seattle.Crime.Analysis,
+                family=binomial,na.action=na.omit)
+summary(ps.model) # Pscores calculated by logit where outcome = binary treatment status
+# covariates to be chosen that related to both treatment and potential outcomes
+
+# Next calculate the pscores for each observations having a retailer
+Seattle.Crime.Analysis$pscore <- predict(ps.model, newdata = Seattle.Crime.Analysis, type = "response")
+
+# Figure problem from last plot
+par("mar")
+par(mar=c(1,1,1,1))
+
+# There seems to be a common support problem!
+labs <- paste("Retailer in GEOID established:", c("Yes", "No"))
+Seattle.Crime.Analysis %>%
+  mutate(Established = ifelse(Established == 1, labs[1], labs[2])) %>%
+  ggplot(aes(x = pscore)) +
+  geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
+  facet_wrap(~Established) +
+  xlab("Probability of having a Retailer in GEOID") +
+  theme_bw()
+
+# ranges of pscore for D = 0 and D = 1
+range(Seattle.Crime.Analysis$pscore[Seattle.Crime.Analysis$Established==0])
+range(Seattle.Crime.Analysis$pscore[Seattle.Crime.Analysis$Established==1])
+
+# mod_match <- matchit(Established ~ CrimePerThousand, method = "nearest", data = Seattle.Crime.Analysis)
+Crime.pscore <- Seattle.Crime.Analysis[Seattle.Crime.Analysis$pscore >= 0.0975710 & Seattle.Crime.Analysis$pscore <= 6.732709e-01,]
+summary(Crime.pscore$pscore)
+
+M9 <- lm(log(CrimePerThousand) ~ Established + share_poverty + AgeCat + RaceCat + GEOID, data = Crime.pscore)
+summary(M9)
+head(M9$terms)
+# compare to unrestricted regerssion
+summary(M6)
+
+
+
 

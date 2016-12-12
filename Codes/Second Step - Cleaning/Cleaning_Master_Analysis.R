@@ -124,8 +124,8 @@ Seattle.Merged2 <- Seattle.Merged2[,c(1, 17:23)]
 Seattle.Crime.Analysis <- merge(Seattle.Merged, Seattle.Merged2, by=c("GEOID", "Month"), all=TRUE)
 
 # Drop all without information on Months
-na_Month <- which(is.na(Seattle.Merged$Month))
-Seattle.Merged <- Seattle.Merged[-na_Month,]
+na_Month <- which(is.na(Seattle.Crime.Analysis$Month))
+Seattle.Crime.Analysis <- Seattle.Crime.Analysis[-na_Month,]
 
 # Remove 
 rm(a, b, c, d, x1, x2, x3, loop, value, na_Month, na_SOE, na_id, Seattle.Merged, Seattle.Merged2)
@@ -133,8 +133,6 @@ rm(a, b, c, d, x1, x2, x3, loop, value, na_Month, na_SOE, na_id, Seattle.Merged,
 ###
 # Data Cleaning
 ###
-
-Seattle.Crime.Analysis <- Seattle.Crime
 
 # 1. Re-name variables to make them more humanly readable
 colnames(Seattle.Crime.Analysis)[colnames(Seattle.Crime.Analysis)=="percenthighincome"] <- "share_over_$200k"
@@ -271,10 +269,11 @@ Seattle.Crime.Analysis$Crime[which(grepl("LIQUOR", Seattle.Crime.Analysis$Event.
 Seattle.Crime.Analysis$Crime[which(grepl("DUI", Seattle.Crime.Analysis$Event.Clearance.Description))] <- "Alcohol"
 Seattle.Crime.Analysis$Crime[which(grepl("DRUG RELATED", Seattle.Crime.Analysis$Event.Clearance.Description))] <- "Other Drug Related"
 
+str(Seattle.Crime.Analysis$Crime)
 # Monthly counts for Crime
-s1 <- summaryBy(Crime ~ GEOID + Month + Crime, data = Seattle.Crime.Analysis,
+s1 <- summaryBy(factor(Crime) ~ GEOID + Month + Crime, data = Seattle.Crime.Analysis,
           FUN = function(x) { c(s = sum(x)) } )
-colnames(s1)[colnames(s1)=="Crime.s"] <- "CrimePerMonth" # Crime per Month was erroneously coded in the old version
+colnames(s1)[colnames(s1)=="factor(Crime).s"] <- "CrimePerMonth" # Crime per Month was erroneously coded in the old version
 Seattle.Crime.Analysis$CrimePerMonth <- NULL
 
 Seattle.Crime.Analysis <- merge(Seattle.Crime.Analysis, s1, by=c("GEOID", "Month", "Crime"))
@@ -284,38 +283,39 @@ Seattle.Crime.Analysis$CrimePerThousand <- Seattle.Crime.Analysis$CrimePerMonth 
 
 # make GEOID a factor variable
 Seattle.Crime.Analysis$GEOID <- as.factor(Seattle.Crime.Analysis$GEOID)
+Seattle.Crime.Analysis$Crime <- as.factor(Seattle.Crime.Analysis$Crime)
 
 # Create an age categorical variable
 summary(Seattle.Crime.Analysis$Adult) # 72.36 % of population between 18-64 years old
 summary(Seattle.Crime.Analysis$Kids)
 summary(Seattle.Crime.Analysis$Retiree)
 
-Seattle.Crime.Analysis$AgeCat <- NA
-Seattle.Crime.Analysis$AgeCat[Seattle.Crime.Analysis$Adult>=72.36] <- "More than average Adults"
-Seattle.Crime.Analysis$AgeCat[Seattle.Crime.Analysis$Adult<=72.36] <- "Below than average Adults"
+#Seattle.Crime.Analysis$AgeCat <- NA
+#Seattle.Crime.Analysis$AgeCat[Seattle.Crime.Analysis$Adult>=72.36] <- "More than average Adults"
+#Seattle.Crime.Analysis$AgeCat[Seattle.Crime.Analysis$Adult<=72.36] <- "Below than average Adults"
 
-Seattle.Crime.Analysis$AgeCat <- as.factor(Seattle.Crime.Analysis$AgeCat)
+#Seattle.Crime.Analysis$AgeCat <- as.factor(Seattle.Crime.Analysis$AgeCat)
 
 # Create an education categorical variable
 summary(Seattle.Crime.Analysis$HighSchool)
 summary(Seattle.Crime.Analysis$Degree)
 
-Seattle.Crime.Analysis$EduCat <- NA
-Seattle.Crime.Analysis$EduCat[Seattle.Crime.Analysis$Degree>=84.48] <- "More than average Graduates"
-Seattle.Crime.Analysis$EduCat[Seattle.Crime.Analysis$Degree<=84.48] <- "Below than average Graduates"
+#Seattle.Crime.Analysis$EduCat <- NA
+#Seattle.Crime.Analysis$EduCat[Seattle.Crime.Analysis$Degree>=84.48] <- "More than average Graduates"
+#Seattle.Crime.Analysis$EduCat[Seattle.Crime.Analysis$Degree<=84.48] <- "Below than average Graduates"
 
-Seattle.Crime.Analysis$EduCat <- as.factor(Seattle.Crime.Analysis$EduCat)
+#Seattle.Crime.Analysis$EduCat <- as.factor(Seattle.Crime.Analysis$EduCat)
 
 # Create a race categorical variable
 summary(Seattle.Crime.Analysis$White)
 summary(Seattle.Crime.Analysis$Black)
 summary(Seattle.Crime.Analysis$share_multiple_races)
 
-Seattle.Crime.Analysis$RaceCat <- NA
-Seattle.Crime.Analysis$RaceCat[Seattle.Crime.Analysis$White>=73.18] <- "More than average Whites"
-Seattle.Crime.Analysis$RaceCat[Seattle.Crime.Analysis$White<=73.18] <- "Below than average Blacks"
+#Seattle.Crime.Analysis$RaceCat <- NA
+#Seattle.Crime.Analysis$RaceCat[Seattle.Crime.Analysis$White>=73.18] <- "More than average Whites"
+#Seattle.Crime.Analysis$RaceCat[Seattle.Crime.Analysis$White<=73.18] <- "Below than average Blacks"
 
-Seattle.Crime.Analysis$RaceCat <- as.factor(Seattle.Crime.Analysis$RaceCat)
+#Seattle.Crime.Analysis$RaceCat <- as.factor(Seattle.Crime.Analysis$RaceCat)
 
 # Write data set, so that it can be loaded more quickly
 write.table(Seattle.Crime.Analysis,gzfile("./Data/SeattleCrimeAnalysis.gz"))
