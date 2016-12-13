@@ -29,11 +29,26 @@ Our project will be using three main data sets: i) cannabis data on Washington S
 Our project has taken advantage of one of the provisions within the ['Washington Initiative 502']('http://www.502data.com'), the initiative that brought about the legalization of cannabis in Washington State, that established disclosure of retailers, processors and producers as well as some general economic data online. The data has been web-scraped using the rvest package [@R-rvest]. As there have been difficulties due to the 502data site being scripted in Java, we additionally needed the ['phantomjs']('http://phantomjs.org/') file to use the RSelenium package [@R-RSelenium] to make the web-scraping possible. 
 
 As the ".exe"-file does not work on Macs and because scraping is time-consuming, we will provide an unaldutered ".txt"-file called "ProdProc" for all producers and processors and one called "Retailer" for retailers. This way we allow for as much reproducibility as possible. The data lists the names and locations of producers/processors in the state and of retailers including YTD sales and tax revenue. For the later analysis, we will constrain the data set to Seattle. 
-The second set of data concerns data on crime. We [scraped the data for Seattle]('https://data.seattle.gov/api/views/7ais-f98f/rows.json?accessType=DOWNLOAD') with the jsonlite package [@R-jsonlite] and formatted it into R-readable format with the gdata package [@R-gdata]. The initial data set is rather large (>80 MB). We have transformed it into a zipped-file called "CrimeSeattle.gz". For the analysis, we cleaned the data so to only contain information about the longitude/latitude, the type of crime and the time it has occurde. For the types of crime we have aggregated individual types into seven broad categories: i) alcohol-related crime (includes Liquor offenses and DUI offenses), ii) burglary/theft, iii) marijuana-related crime, iv) narcotics-related crime, v) other-drug related crimes, vi) property crime, and vii) violent crime (includes armed robberies, assaults, drive by shootings, strong arm robbery and homicides).
+The second set of data concerns data on crime. We [scraped the data for Seattle]('https://data.seattle.gov/api/views/7ais-f98f/rows.json?accessType=DOWNLOAD') with the jsonlite package [@R-jsonlite] and formatted it into R-readable format with the gdata package [@R-gdata]. The initial data set is rather large (>80 MB). We have transformed it into a zipped-file called "CrimeSeattle.gz". For the analysis, we cleaned the data so to only contain information about the longitude/latitude, the type of crime and the time it has occurde. For the types of crime we have aggregated individual types into seven broad categories: i) alcohol-related crime (includes Liquor offenses and DUI offenses), ii) burglary/theft, iii) marijuana-related crime, iv) narcotics-related crime, v) other-drug related crimes, vi) property crime, and vii) violent crime (includes armed robberies, assaults, drive by shootings, strong arm robbery and homicides). 
 
-The third set of data comes from the U.S. Census data and provides us with socio-economic factors for each district. One limitation is that we, however, only have this data annually and only for 2014. The variables included for this analysis are the share of poverty for each district, the average age level, the prevalence of minority races, as well as the level of education. While these are classic socio-economic factors, the lack of variation means that they will only be useful for the regular OLS regression as well as for the propensity score matching, which means that this set of data will be of limited value overall.^[should find quote for stereotypical soes]
+The third set of data comes from the U.S. Census data and provides us with socio-economic factors for each district. Our code to obtain these data follows [the concept of the blog post by zevross](http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/). One limitation is that we, however, only have this data annually and only for 2014. The variables included for this analysis are the share of poverty for each district, the average age level, the prevalence of minority races, as well as the level of education. While these are classic socio-economic factors, the lack of variation means that they will only be useful for the regular OLS regression as well as for the propensity score matching, which means that this set of data will be of limited value overall.^[should find quote for stereotypical soes]
+
+In order to be able to merge all three data sets, we needed to ensure that we had geospatial data in all of them. Only for the first data set did we not already have longitude and latitude data. To obtain these, we scraped the street locations for all available retailers from [kushtourism.com](http://kushtourism.com/washington-recreational-marijuana-retail-map-and-directory/#Seattle). With this information, we were able to use a simple Google API query in combination with the RJSONIO package [@R-RJSONIO] to determine latitude and longitude for each observation. This left us with 15 individual retailers for Seattle for which we have data.^[The query was conducted on 10 November 2016] For the merger of all three data sets, we calculated the centroid of each district of the U.S. Census Data and then calculated the minimum distance of crime incidents and retailers using the fields package [@R-fields]. The final data set is called "SeattleCrimeAnalysis.gz". As we are not looking at the individual perpetrator but at the crime incident of a district, we feel that this is an adequate way of merging the data set.
 
 ###Methodology
+
+other packages that have been used will be referred to below
+initially descriptive statistics
+then ols
+then matching
+then fel
+
+## Analysis
+
+### Descritpive Statistics
+
+there was a problem with the names of retailers not uniquely identifying retail shops. To uniquely identify the length of our data set, we thus need to look at the unique URLs rather than the names. This is not yet a concern however, because the observations that are affected drop out in our later analysis of Seattle.
+
 
 
 \pagebreak
@@ -41,3 +56,6 @@ The third set of data comes from the U.S. Census data and provides us with socio
 ## References
 
 ---
+nocite: |
+  @R-RCurl, @R-RJSONIO, @R-gdata, @R-acs, @R-scales, @R-sp, @R-rgdal, @R-maptools, @R-tigris, @R-dplyr, @R-magrittr]
+...
