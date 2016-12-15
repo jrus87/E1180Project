@@ -5,7 +5,7 @@ repmis::set_valid_wd(wrkdir)
 rm(wrkdir)
 
 # Installing packages
-packages <- c('dplyr', 'repmis', 'fields', 'cowplot', 'ggmap', 'ggplot2', 'stargazer', 'scales', 'doBy')
+packages <- c('dplyr', 'repmis', 'fields', 'cowplot', 'ggmap', 'ggplot2', 'stargazer', 'scales', 'doBy', 'xtable')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -63,7 +63,8 @@ WA.bar <- data.frame(Year, WA.numbers, WA.name, stringsAsFactors = FALSE)
 washington.barplot <- ggplot(WA.bar, aes(x=Year, y=WA.numbers, fill=WA.name)) +
   geom_bar(stat="identity", colour="black",width=.8, position=position_dodge()) + 
   theme_bw() + xlab("Year") + ylab("Frequency") + scale_fill_hue(name="") +
-  ggtitle("Number of Firms in WA")
+  ggtitle("Number of Firms in WA") +
+  theme(axis.text.x = element_text(angle=90), legend.position = "bottom")  
 
 # Growth pattern:
 
@@ -118,7 +119,8 @@ washington.barplot.e <- ggplot(WA.bar.e, aes(x=Year, y=WA.numbers.e, fill=WA.nam
   geom_bar(stat="identity", colour="black",width=.8, position=position_dodge()) + 
   theme_bw() + xlab("Year") + ylab("Amount in Mio. US-Dollars") + 
   scale_fill_hue(name="") +
-  ggtitle("Cannabis Sales and Tax Revenues in WA")
+  ggtitle("Cannabis Sales and Tax Revenues in WA") +
+  theme(axis.text.x = element_text(angle=90), legend.position = "bottom") 
 
 # Growth pattern:
 
@@ -132,6 +134,16 @@ washington.barplot.e <- ggplot(WA.bar.e, aes(x=Year, y=WA.numbers.e, fill=WA.nam
 
 rm(Sales2014, Sales2015, Sales2016, ExciseTax2014, ExciseTax2015, ExciseTax2016,
    WA.bar.e, WA.name.e, WA.numbers.e, Year)
+
+# 2. Table of variables
+Variables <- c("Producer/Processor", "Retailer", "Excise Tax", "Sales", "Crime Categories", "Established", "Poverty Rate",
+               "Age", "Diversity", "Education", "GEOID", "Time")
+Operationalisation <- c("Count of Producers/Processors in WA", "Count of Retailers in WA", "Sum of taxes paid by retailers",
+                        "Sum of revenue made by retailers", "Aggregates of Crime incidents from Seattle 911-Incident Database in log/1000 citizens",
+                        "Treatment variable: 0 if no dispensary, 1 otherwise", "Share of People < $15,000/year",
+                        "Share of Kids, Adults and Retirees", "Share of Whites, Blacks and Multiple Races", "Share of Degree holders","U.S. Census District",
+                        "Months from Jan 2014 to Oct 2016")
+Table <- data.frame(Variables, Operationalisation, stringsAsFactors = TRUE)
 
 # 3. Create a crime subset for Month October 2016
 
@@ -158,6 +170,10 @@ Crime.lines$log <- log(Crime.lines$CrimePerThousand)
 # 1. Create specific crime variables for the analysis of crime subsets
 
 table(Seattle.Crime.Analysis$Crime)
+
+na_drop <- which(is.na(Seattle.Crime.Analysis$CrimePerThousand))
+Seattle.Crime.Analysis <- Seattle.Crime.Analysis[-na_drop,]
+rm(na_drop)
 
 Seattle.Crime.Analysis$AlcCrime <- NA
 Seattle.Crime.Analysis$AlcCrime[Seattle.Crime.Analysis$Crime=="Alcohol"] <- Seattle.Crime.Analysis$CrimePerThousand[Seattle.Crime.Analysis$Crime=="Alcohol"]
@@ -218,4 +234,5 @@ Box9 <- ggplot(Seattle.Crime.Analysis, aes(factor(Established), log(ViolCrime)))
 Box9 <- Box9 + geom_boxplot(aes(fill=Established)) +
   xlab("Violent crime") + ylab("")  +
   ylim(-6,4) + theme(legend.position='none')
+
 

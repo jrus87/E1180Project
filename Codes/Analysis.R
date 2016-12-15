@@ -23,9 +23,15 @@ rm(packages, p, wrkdir)
 source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R") 
 
 
-names(Seattle.Crime.Analysis)
-Analysis <- Seattle.Crime.Analysis[,c(1:3,16,28:29,30:33)]
-which(is.na(Analysis))
+names(Seattle.Crime.Analysis) # why does plots preparation not work fully? it cuts off after alccrime
+Analysis <- Seattle.Crime.Analysis[,c(1:3,15,17,28, 30:38)]
+# there are 35 distinct GEOIDs and 34 distinct Months
+
+
+
+
+
+
 
 ###
 # Descriptive Statistics

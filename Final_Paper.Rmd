@@ -6,7 +6,10 @@ output:
   pdf_document:
     toc: true
     toc_depth: 2
-bibliography: FinalAnalysis.bib
+    fig_caption: true
+bibliography: 
+  - FinalAnalysis.bib
+  - OtherLiterature.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -23,7 +26,7 @@ Lorem ipsum dolor sit amet, oportere pertinacia repudiandae ne mea, eam ne meis 
 
 ## Data Gathering and Methodology (1000 words?)
 
-###Data Gathering
+###Data Gathering (so far: 657 words)
 Our project will be using three main data sets: i) cannabis data on Washington State, ii) crime data on Seattle, WA, and iii) socio-economic data on Seattle, WA. As the policy field of cannabis legalization is a rather nascent field of study, there has been limited availability of reliable data (previous data sources were clouted by the illegality of possession and consumption and thus approximated dark figures). 
 
 Our project has taken advantage of one of the provisions within the ['Washington Initiative 502']('http://www.502data.com'), the initiative that brought about the legalization of cannabis in Washington State, that established disclosure of retailers, processors and producers as well as some general economic data online. The data has been web-scraped using the rvest package [@R-rvest]. As there have been difficulties due to the 502data site being scripted in Java, we additionally needed the ['phantomjs']('http://phantomjs.org/') file to use the RSelenium package [@R-RSelenium] to make the web-scraping possible. 
@@ -35,20 +38,53 @@ The third set of data comes from the U.S. Census data and provides us with socio
 
 In order to be able to merge all three data sets, we needed to ensure that we had geospatial data in all of them. Only for the first data set did we not already have longitude and latitude data. To obtain these, we scraped the street locations for all available retailers from [kushtourism.com](http://kushtourism.com/washington-recreational-marijuana-retail-map-and-directory/#Seattle). With this information, we were able to use a simple Google API query in combination with the RJSONIO package [@R-RJSONIO] to determine latitude and longitude for each observation. This left us with 15 individual retailers for Seattle for which we have data.^[The query was conducted on 10 November 2016] For the merger of all three data sets, we calculated the centroid of each district of the U.S. Census Data and then calculated the minimum distance of crime incidents and retailers using the fields package [@R-fields]. The final data set is called "SeattleCrimeAnalysis.gz". As we are not looking at the individual perpetrator but at the crime incident of a district, we feel that this is an adequate way of merging the data set.
 
-###Methodology
+###Methodology (so far 198 words)
 
-other packages that have been used will be referred to below
-initially descriptive statistics
-then ols
-then matching
-then fel
+This study will employ several methods in order to analyse whether there is a discernible effect between there being a dispensary in a given district of Seattle and the logarithmic crime incident per 1000 people in that district. 
+We will first use descriptive statistics to show the development of the cannabis industry in Washington State and Seattle to give a feeling for the scope of the topic at hand. The descriptive statistic will be rounded up by a quick look at the differences in means between districts with and districts without a dispensary.
+Secondly, we will perform a standard ordinary least squares analysis (OLS) to analyse the main relationship of this paper. Unfortunately, normal OLS is unable to adequately identify causal effects when data is observational. It might be good for an initial understanding but not more. To account for this, we complement this analysis with a propensity score matching model. "Matching on the propensity score is esentially a weighting scheme, which determines what weights are placed on comparison units when computing the estimated treatment"^[@dehejia2002propensity: 153.] This means that far from looking at the average effect across all districts, we will try to identify how the establishment of a dispensary has changed crime incidents for similar districts (which should boost our confidence in causality).
+As propensity score matching has recently been under fire, we will also use another robustness checks: the robustness check is a simple fixed effects model, as it "avoids the ommited variable bias through controlling for [district] level heterogeneity by means of dummy variables.^[@mohring2012fixed] To implement this, we will be using the lfe package [@R-lfe], checking its robustness in turn via the plm package [@R-plm]. An alternative robustness check could have been a difference-in-differences analysis that uses establishment as *treatment* and all other districts as *control* groups. Yet, because we have different shops opening at different times throughout the period 2014-2016, we will not adopt this additional model due to its complexity. 
 
 ## Analysis
 
 ### Descritpive Statistics
 
-there was a problem with the names of retailers not uniquely identifying retail shops. To uniquely identify the length of our data set, we thus need to look at the unique URLs rather than the names. This is not yet a concern however, because the observations that are affected drop out in our later analysis of Seattle.
+Let us begin with with simple descriptive statistics. While the 502data is rather well documented, they do, however, run in the issue that their retailers are not uniquely identified by names. Thus, while we will be using the names for producers/processors to get their numbers, we will be using the URL extensions that we received from the scraping process to identify how many retailers there are.
 
+```{r, include = FALSE}
+source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R")
+```
+
+```{r, echo = FALSE, fig.cap="Business Development of Cannabis Production and Sales in Washington State"}
+cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""), align="h", label_size = 10, rel_widths = c(1,1))
+```
+
+As we can see from Figure 1, the nascent industry is already booming in Washington with both the numbers of actors and the sales/tax revenues being already higher in October 2016 than in all of 2015. The numbers are quite staggering:
+
+1. Number of Producers and Processors: The number increased by 210% YoY in 2015 from 185 to 574 and by another 53% in the ten months leading up to October 2016 to 881.
+2. Number of Retailers: The number increased by 130% YoY in 2015 from 82 to 189 and by another 69% in the ten months leading up to October 2016 to 319.
+3. Increase of revenues in sales: The number increased by 960% YoY in 2015 from $29.21^[when did the first one open] Mill to $309.86 Mill and by another 77% in the ten months leading up to October 2016 to $549.93 Mill.
+4. Increase of tax revenues: The number increased by 1040% YoY in 2015 from $9.74 Mill to $110.97 Mill and by another 83% in the ten months leading up to October 2016 to $203.47 Mill.
+
+
+
+Thus, we know that this is not just a niche industry.^[maybe add here the GDP of WA to make a % comparison] Unfortunately, we do not have data on how many quantities have been sold or reliable data on the price development because otherwise we could also analyse the actual use in quantities. 
+
+
+
+
+
+Let me now introduce to you the dependent and explanatory variables that we use in this analysis 
+
+```{r, echo=FALSE, results='asis'}
+# change into only Y and X? also time is missing!
+tab <- xtable(Table, caption = "List of dependent and explanatory variables used in analysis")
+print(tab, type="latex", floating=TRUE, latex.environments = "center", comment=FALSE)
+```
+
+
+there was a problem with the names of retailers not uniquely identifying retail shops. To uniquely identify the length of our data set, we thus need to look at the unique URLs rather than the names. This is not yet a concern however, because the observations that are affected drop out in our later analysis of Seattle.
+While Seattle is divided into 132 districts by the U.S. Census, crime incidents have only occured in 35 of them. Out of these 35 districts, we have eight that also have a dispensary.
 
 
 \pagebreak
@@ -57,5 +93,5 @@ there was a problem with the names of retailers not uniquely identifying retail 
 
 ---
 nocite: |
-  @R-RCurl, @R-RJSONIO, @R-gdata, @R-acs, @R-scales, @R-sp, @R-rgdal, @R-maptools, @R-tigris, @R-dplyr, @R-magrittr]
+  @R-RCurl, @R-RJSONIO, @R-gdata, @R-acs, @R-scales, @R-sp, @R-rgdal, @R-maptools, @R-tigris, @R-dplyr, @R-magrittr
 ...
