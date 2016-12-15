@@ -5,7 +5,7 @@ repmis::set_valid_wd(wrkdir)
 rm(wrkdir)
 
 # Installing packages
-packages <- c('dplyr', 'repmis', 'fields', 'cowplot', 'ggmap', 'ggplot2', 'stargazer', 'scales', 'doBy', 'xtable')
+packages <- c('dplyr', 'repmis', 'fields', 'cowplot', 'ggmap', 'ggplot2', 'stargazer', 'scales', 'doBy', 'xtable', 'plm')
 for (p in packages) {
   if (p %in% installed.packages()) require(p, character.only=TRUE) 
   else {
@@ -140,9 +140,9 @@ Variables <- c("Producer/Processor", "Retailer", "Excise Tax", "Sales", "Crime C
                "Age", "Diversity", "Education", "GEOID", "Time")
 Operationalisation <- c("Count of Producers/Processors in WA", "Count of Retailers in WA", "Sum of taxes paid by retailers",
                         "Sum of revenue made by retailers", "Aggregates of Crime incidents from Seattle 911-Incident Database in log/1000 citizens",
-                        "Treatment variable: 0 if no dispensary, 1 otherwise", "Share of People < $15,000/year",
-                        "Share of Kids, Adults and Retirees", "Share of Whites, Blacks and Multiple Races", "Share of Degree holders","U.S. Census District",
-                        "Months from Jan 2014 to Oct 2016")
+                        "Treatment variable: 0 if no dispensary, 1 otherwise", "Share of People < $15,000/year as percent of total people in district",
+                        "Shares of Adults in comparison to mean of Seattle", "Share of Whites in comparison to mean of Seattle", 
+                        "Share of Degree holders in comparison to mean of Seattle","U.S. Census District", "Months from Jan 2014 to Oct 2016")
 Table <- data.frame(Variables, Operationalisation, stringsAsFactors = TRUE)
 
 # 3. Create a crime subset for Month October 2016
@@ -164,6 +164,20 @@ str(Seattle.Crime.Analysis$CrimePerThousand)
 
 Crime.lines <- aggregate(cbind(CrimePerThousand) ~ Crime + Month, data=Seattle.Crime.Analysis, FUN=function(x) mean(range(x)))
 Crime.lines$log <- log(Crime.lines$CrimePerThousand)
+
+crime.graph <- ggplot(Crime.lines, aes(Month, CrimePerThousand, group=Crime, colour = factor(Crime))) 
+crime.graph <- crime.graph + geom_line() +
+  xlab("Months") + ylab("Crime frequency per 1000 inhabitants") + theme_bw() +
+  theme(axis.text.x = element_text(angle=90)) +
+  labs(colour = "Crime Categories") +
+  ggtitle("Crime rates development in Seattle")
+
+crime.graph.log <- ggplot(Crime.lines, aes(Month, log, group=Crime, colour = factor(Crime))) 
+crime.graph.log <- crime.graph.log + geom_line() +
+  xlab("Months") + ylab("Natural logarithm of Crime Rate per 1000 inhabitants") + theme_bw() +
+  theme(axis.text.x = element_text(angle=90)) +
+  labs(colour = "Crime Categories") +
+  ggtitle("Crime rates development in Seattle")
 
 # 5. Analysis
 
@@ -202,7 +216,7 @@ Seattle.Crime.Analysis$GEOID <- as.factor(Seattle.Crime.Analysis$GEOID)
 # 3. Barplots for all different subsets of crime
 Box3 <- ggplot(Seattle.Crime.Analysis, aes(factor(Established), log(AlcCrime)))
 Box3 <- Box3 + geom_boxplot(aes(fill=Established)) +
-  xlab("Alcohol-related crime (insignificant)") + ylab("")  +
+  xlab("Alcohol (insignificant)") + ylab("")  +
   ylim(-6,4) + theme(legend.position='none')
 
 Box4 <- ggplot(Seattle.Crime.Analysis, aes(factor(Established), log(BurCrime)))
@@ -212,17 +226,17 @@ Box4 <- Box4 + geom_boxplot(aes(fill=Established)) +
 
 Box5 <- ggplot(Seattle.Crime.Analysis, aes(factor(Established), log(MarCrime)))
 Box5 <- Box5 + geom_boxplot(aes(fill=Established)) +
-  xlab("Marijuana-related crime") + ylab("")  +
+  xlab("Marijuana") + ylab("")  +
   ylim(-6,4) + theme(legend.position='none')
 
 Box6 <- ggplot(Seattle.Crime.Analysis, aes(factor(Established), log(NarcCrime)))
 Box6 <- Box6 + geom_boxplot(aes(fill=Established)) +
-  xlab("Narcotics-related crime") + ylab("Natural logarithm of Crime")  +
+  xlab("Narcotics") + ylab("Natural logarithm of Crime")  +
   ylim(-6,4) + theme(legend.position='none')
 
 Box7 <- ggplot(Seattle.Crime.Analysis, aes(factor(Established), log(OtherCrime)))
 Box7 <- Box7 + geom_boxplot(aes(fill=Established)) +
-  xlab("Other drug-related crime") + ylab("")  +
+  xlab("Other drugs") + ylab("")  +
   ylim(-6,4) + theme(legend.position='none')
 
 Box8 <- ggplot(Seattle.Crime.Analysis, aes(factor(Established), log(PropCrime)))
@@ -235,4 +249,158 @@ Box9 <- Box9 + geom_boxplot(aes(fill=Established)) +
   xlab("Violent crime") + ylab("")  +
   ylim(-6,4) + theme(legend.position='none')
 
+#####
+## Inferential statistics
+#####
 
+Analysis <- Seattle.Crime.Analysis[,c(1:3,6:15,17,28, 30:38)]
+
+# 1. Create Categorical Variables
+
+# Education 
+quantile(Analysis$Degree)
+
+Analysis$EduCat <- NA
+Analysis$EduCat[Analysis$Degree<76.56882] <- '# Graduates: Very low'
+Analysis$EduCat[Analysis$Degree>=76.56882 & Analysis$Degree<84.29752] <- '# Graduates: Low'
+Analysis$EduCat[Analysis$Degree>=84.29752 & Analysis$Degree<93.87976] <- '# Graduates: High'
+Analysis$EduCat[Analysis$Degree>=93.87976] <- '# Graduates: Very High'
+Analysis$EduCat <- as.factor(Analysis$EduCat)
+
+table(Analysis$EduCat)
+contrasts(Analysis$EduCat)
+Analysis$EduCat <-relevel(Analysis$EduCat, "# Graduates: Low")
+
+
+# Diversity
+quantile(Analysis$White)
+
+Analysis$Diversity <- NA
+Analysis$Diversity[Analysis$White<60.769069] <- 'Diversity: Very high'
+Analysis$Diversity[Analysis$White>=60.769069 & Analysis$White<82.327586] <- 'Diversity: High'
+Analysis$Diversity[Analysis$White>=82.327586 & Analysis$White<90.541192] <- 'Diversity: Low'
+Analysis$Diversity[Analysis$White>=90.541192] <- 'Diversity: Very Low'
+Analysis$Diversity <- as.factor(Analysis$Diversity)
+
+table(Analysis$Diversity)
+contrasts(Analysis$Diversity)
+Analysis$Diversity <-relevel(Analysis$Diversity, "Diversity: Low")
+
+# Adults
+quantile(Analysis$Adult)
+
+Analysis$Adulthood <- NA
+Analysis$Adulthood[Analysis$Adult<63.60825] <- '# Adults: Below average'
+Analysis$Adulthood[Analysis$Adult>=63.60825 & Analysis$Adult<72.11816] <- '# Adults: Just below average'
+Analysis$Adulthood[Analysis$Adult>=72.11816 & Analysis$Adult<77.97565] <- '# Adults: Just above average'
+Analysis$Adulthood[Analysis$Adult>=77.97565] <- '# Adults: Above average'
+Analysis$Adulthood <- as.factor(Analysis$Adulthood)
+
+table(Analysis$Adulthood)
+contrasts(Analysis$Adulthood)
+Analysis$Adulthood <-relevel(Analysis$Adulthood, "# Adults: Just below average")
+
+# 2. Clean data
+
+names(Analysis)
+Analysis <- Analysis[,c(1:3, 13, 15:27)]
+
+# 3. Appendix
+
+# A.1
+CrimePerThousand <- ggplot(Analysis, aes(x=CrimePerThousand)) + geom_histogram(breaks=seq(0.0001296, 1.0660000, 0.005)) +
+  theme_bw() + xlab("Crime Per 1000 citizens") + ylab("Frequency") +
+  ggtitle("Crime Incidents")
+
+LogCrimePerThousand <- ggplot(Analysis, aes(x=log(CrimePerThousand))) + geom_histogram(breaks=seq(-8.95100, 0.06375, 0.075)) +
+  theme_bw() + xlab("Crime Per 1000 citizens") + ylab("Frequency") +
+  ggtitle("Natural Logarithm of Crime Incidents")
+
+#SharePoverty <- ggplot(Analysis, aes(x=factor(GEOID), y=share_poverty)) + stat_summary(fun.y="mean", geom="bar") +
+  #geom_bar(stat="identity", colour="black",width=.8) +
+  #theme_bw() + xlab("GEOID") + ylab("Share Poverty") +
+  #ggtitle("Distribution of Poverty across Districts") +
+  #theme(axis.text.x = element_text(angle=90))
+
+# A.2
+M1 <- lm(log(CrimePerThousand) ~ Established, data = Seattle.Crime.Analysis) 
+
+CrimeAllBut201401 <- which(grepl("2014-01", Seattle.Crime.Analysis$Month))
+CrimeAllBut201401 <- Seattle.Crime.Analysis[-CrimeAllBut201401, ]
+
+M1.b <- lm(log(CrimePerThousand) ~ Established, data = CrimeAllBut201401)
+
+
+
+# 4. Analysis
+
+######################################################################################
+
+ps.model1 <- glm(Established ~ log(CrimePerThousand), data = Analysis,family=binomial)
+#summary(ps.model) # Pscores calculated by logit where outcome = binary treatment status
+# covariates to be chosen that related to both treatment and potential outcomes
+# Next calculate the pscores for each observations having a retailer
+Analysis$pscore1 <- predict(ps.model1, newdata = Analysis, type = "response")
+
+# Figure problem from last plot
+par("mar")
+par(mar=c(1,1,1,1))
+
+# There seems to be a common support problem!
+labs <- paste("Retailer in GEOID established:", c("Yes", "No"))
+ComSup1 <- Analysis %>%
+  mutate(Established = ifelse(Established == 1, labs[1], labs[2])) %>%
+  ggplot(aes(x = pscore1)) +
+  geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
+  facet_wrap(~Established) +
+  xlab("Probability of having a Retailer in GEOID (univariate)") +
+  theme_bw()
+
+# range
+range(Analysis$pscore1[Analysis$Established==0])
+range(Analysis$pscore1[Analysis$Established==1])
+
+# mod_match <- matchit(Established ~ CrimePerThousand, method = "nearest", data = Analysis)
+Crime.pscore1 <- Analysis[Analysis$pscore1 >= 8.732437e-05 & Analysis$pscore1 <=4.631339e-01,]
+
+M2 <- lm(log(CrimePerThousand) ~ Established, data = Analysis)
+M3 <- lm(log(CrimePerThousand) ~ Established, data = Crime.pscore1)
+
+######################################################################################
+
+
+######################################################################################
+
+ps.model2 <- glm(Established ~ log(CrimePerThousand) + share_poverty + Adulthood + EduCat + Diversity, data = Analysis,family=binomial)
+#summary(ps.model) # Pscores calculated by logit where outcome = binary treatment status
+# covariates to be chosen that related to both treatment and potential outcomes
+# Next calculate the pscores for each observations having a retailer
+Analysis$pscore2 <- predict(ps.model2, newdata = Analysis, type = "response")
+
+# Figure problem from last plot
+par("mar")
+par(mar=c(1,1,1,1))
+
+# There seems to be a common support problem!
+labs <- paste("Retailer in GEOID established:", c("Yes", "No"))
+ComSup2 <- Analysis %>%
+  mutate(Established = ifelse(Established == 1, labs[1], labs[2])) %>%
+  ggplot(aes(x = pscore2)) +
+  geom_histogram(color = "white", breaks=seq(0,1,by=0.025)) +
+  facet_wrap(~Established) +
+  xlab("Probability of having a Retailer in GEOID (univariate)") +
+  theme_bw()
+
+# range
+range(Analysis$pscore2[Analysis$Established==0])
+summary(Analysis$pscore2[Analysis$Established==0]) # how to get data in quintiles?
+range(Analysis$pscore2[Analysis$Established==1])
+
+# mod_match <- matchit(Established ~ CrimePerThousand, method = "nearest", data = Analysis)
+Crime.pscore2 <- Analysis[Analysis$pscore1 >= 0.04355676 & Analysis$pscore1 <=9.235078e-01,]
+
+M4 <- lm(log(CrimePerThousand) ~ Established + share_poverty + Adulthood + EduCat + Diversity, data = Analysis)
+M5 <- lm(log(CrimePerThousand) ~ Established + share_poverty + Adulthood + EduCat + Diversity, data = Crime.pscore2)
+
+#felm(log(CrimePerThousand)~Established + AgeCat + share_poverty + RaceCat | GEOID + Month, data = Analysis)
+M6 <- plm(log(CrimePerThousand)~Established, data = Analysis, index=c("GEOID"), model="within")

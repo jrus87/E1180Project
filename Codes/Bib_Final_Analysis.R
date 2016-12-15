@@ -4,7 +4,7 @@ wrkdir <- c('C:/Users/Benji/Desktop/Statistics/Git/Repositories/E1180Project',
 repmis::set_valid_wd(wrkdir)
 
 # Installing packages
-packages <- c('acs', 'cowplot','plyr', 'dplyr', 'fields', 'gdata', 'ggmap', 'ggplot2', 'jsonlite', 'lfe','magrittr', 'maptools',
+packages <- c('acs', 'cowplot','plyr', 'dplyr', 'fields', 'gdata', 'ggmap', 'ggplot2', 'jsonlite', 'magrittr', 'maptools',
               'plm','RCurl', 'repmis', 'rgdal', 'RJSONIO', 'RSelenium', 'rvest', 'scales', 'sp', 'tigris', 'stargazer', 'readr',
               'xtable')
 for (p in packages) {
