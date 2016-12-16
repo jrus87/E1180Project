@@ -62,7 +62,7 @@ Table 1 shows the variables used in the next part of our analysis. While Seattle
 
 Like most large cities in the U.S., crime is an issue in Seattle as well. If we look at Figure 2, we can see the distribution of our different crime categories for October 2016. We can clearly see that crime is concentrated in central Seattle, and that there is less crime around the red dots that represent the existence of a dispensary. The stark concentration of crime follows the experience of other big cities: take Boston as an example where "fewer than 5 percent of [its] street corners and block faces generated 74 percent of fatal and non-fatal shootings between 1980 and 2008".
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 Map2 <- qmap("seattle", zoom = 12, source="google", maptype="roadmap")
 Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
   geom_point(data=CrimeOct2016, aes(x=lon, y=lat, colour = factor(Crime)), alpha=0.75, size=1.1) +
