@@ -6,9 +6,6 @@ output:
   html_document:
     toc: yes
     toc_depth: '2'
-bibliography:
-- FinalAnalysis.bib
-- OtherLiterature.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -29,15 +26,15 @@ In our research, we explore marijuana legalization by aiming to address policy i
 ###Data Gathering
 Our project used three data sets: i) cannabis data on Washington State, ii) crime data on Seattle, WA, and iii) socio-economic data on Seattle, WA. As the policy field of cannabis legalization is a nascent field of study, reliable data were few and far between. 
 
-Our project began with the ['Washington Initiative 502']('http://www.502data.com'), the initiative that brought about the legalization of cannabis, and published data about producers and retailers in the state. We scraped the data using the rvest package [@R-rvest]. And since there were difficulties with the site being written in Java, we needed the ['phantomjs']('http://phantomjs.org/') file to use the RSelenium package [@R-RSelenium] to make things a bit more manageable.
+Our project began with the ['Washington Initiative 502']('http://www.502data.com'), the initiative that brought about the legalization of cannabis, and published data about producers and retailers in the state. We scraped the data using the rvest package. And since there were difficulties with the site being written in Java, we needed the ['phantomjs']('http://phantomjs.org/') file to use the RSelenium package to make things a bit more manageable.
 
 As the ".exe"-file does not work on Mac products and Apple operating systems, and because scraping is time-consuming, we made a ".txt"-file called "ProdProc" for all producers and processors and one called "Retailer" for retailers, allowing for as much reproducibility as possible. The data lists the names and locations of producers and processors in the state and of retailers including year-to-date sales and tax revenue.
 
-The second set of data concerns crime. We [scraped the data for Seattle]('https://data.seattle.gov/api/views/7ais-f98f/rows.json?accessType=DOWNLOAD') with the jsonlite package [@R-jsonlite] and formatted it into R-readable format with the gdata package [@R-gdata]. Since the initial data set was large (>80 MB), we made it a zipped-file called "CrimeSeattle.gz". For the analysis, we cleaned the data so to only contain information about the longitude/latitude, the type of crime and the time it has occurred. For types of crime, we aggregated individual types into seven broad categories: i) alcohol-related crime (includes Liquor offenses and DUI offenses), ii) burglary/theft, iii) marijuana-related crime, iv) narcotics-related crime, v) other-drug related crimes, vi) property crime, and vii) violent crime (includes armed robberies, assaults, drive-by shootings, strong armed robbery and homicides). 
+The second set of data concerns crime. We [scraped the data for Seattle]('https://data.seattle.gov/api/views/7ais-f98f/rows.json?accessType=DOWNLOAD') with the jsonlite package and formatted it into R-readable format with the gdata package. Since the initial data set was large (>80 MB), we made it a zipped-file called "CrimeSeattle.gz". For the analysis, we cleaned the data so to only contain information about the longitude/latitude, the type of crime and the time it has occurred. For types of crime, we aggregated individual types into seven broad categories: i) alcohol-related crime (includes Liquor offenses and DUI offenses), ii) burglary/theft, iii) marijuana-related crime, iv) narcotics-related crime, v) other-drug related crimes, vi) property crime, and vii) violent crime (includes armed robberies, assaults, drive-by shootings, strong armed robbery and homicides). 
 
 The third set of data comes from the U.S. Census data and provides us with socio-economic factors for each district. Our code to obtain these data follows [the concept of the blog post by zevross](http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/). One limitation is that we, however, only have this data annually and only for 2014. The variables included for this analysis are the share of poverty for each district, the average age level, the prevalence of minority races, as well as the level of education. While these are classic socio-economic factors, the lack of variation means that they will only be useful for the regular OLS regression as well as for the propensity score matching, which means that this set of data will be of limited value overall.
 
-To merge all three data sets, we needed to ensure that we had geospatial data in all of them. Only for the first data set did we not already have longitude and latitude data. To obtain these, we scraped the street locations for all available retailers from [kushtourism.com](http://kushtourism.com/washington-recreational-marijuana-retail-map-and-directory/#Seattle). With this information, we were able to use a simple Google API query in combination with the RJSONIO package [@R-RJSONIO] to determine latitude and longitude for each observation. This left us with 15 individual retailers for Seattle for which we have data.^[The query was conducted on 10 November 2016] For the merger of all three data sets, we calculated the centroid of each district of the U.S. Census Data and then calculated the minimum distance of crime incidents and retailers using the fields package [@R-fields]. The final data set is called "SeattleCrimeAnalysis.gz". As we are not looking at the individual perpetrator but at the crime incident of a district, we feel that this is an adequate way of merging the data set.
+To merge all three data sets, we needed to ensure that we had geospatial data in all of them. Only for the first data set did we not already have longitude and latitude data. To obtain these, we scraped the street locations for all available retailers from [kushtourism.com](http://kushtourism.com/washington-recreational-marijuana-retail-map-and-directory/#Seattle). With this information, we were able to use a simple Google API query in combination with the RJSONIO package to determine latitude and longitude for each observation. This left us with 15 individual retailers for Seattle for which we have data.^[The query was conducted on 10 November 2016] For the merger of all three data sets, we calculated the centroid of each district of the U.S. Census Data and then calculated the minimum distance of crime incidents and retailers using the fields package. The final data set is called "SeattleCrimeAnalysis.gz". As we are not looking at the individual perpetrator but at the crime incident of a district, we feel that this is an adequate way of merging the data set.
 
 
 ## Our findings
@@ -50,7 +47,7 @@ While the 502data is well documented, the retailers' names aren't given. As a re
 source("./Codes/Third-Step - Plot Preparation/Website.R")
 ```
 
-```{r, echo=FALSE, fig.cap="Business Development of Cannabis Production and Sales in Washington State", fig.height=4, fig.width=6}
+```{r, echo=FALSE}
 cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""), align="h", label_size = 10, rel_widths = c(1,1))
 ```
 
@@ -65,9 +62,9 @@ It's a fast growing industry, and buyers are showing more interest. In relation 
 
 Table 1 shows the variables used in the next part of our analysis. While Seattle is divided into 132 districts by the U.S. Census, crime incidents only occured in 35 of them once accounting for other NA-related issues with our merged data set. Eight of these 35 districts have a dispensary, which is represented by the *treatment* variable "Established". The dependent variable is the natural logarithm of crime incidents per 1000 inhabitants.^[As a total, as well as for each of the seven different crime categories] The poverty rate, age, diversity and education are socio-economic control variables. Table 1 also indicates how these variables have been operationalised. 
 
-Like most large cities in the U.S., crime is an issue in Seattle as well. If we look at Figure 2, we can see the distribution of our different crime categories for October 2016. We can clearly see that crime is concentrated in central Seattle, and that there is less crime around the red dots that represent the existence of a dispensary. The stark concentration of crime follows the experience of other big cities: take Boston as an example where "fewer than 5 percent of [its] street corners and block faces generated 74 percent of fatal and non-fatal shootings between 1980 and 2008".^[@ferguson2016policing 20-21.]
+Like most large cities in the U.S., crime is an issue in Seattle as well. If we look at Figure 2, we can see the distribution of our different crime categories for October 2016. We can clearly see that crime is concentrated in central Seattle, and that there is less crime around the red dots that represent the existence of a dispensary. The stark concentration of crime follows the experience of other big cities: take Boston as an example where "fewer than 5 percent of [its] street corners and block faces generated 74 percent of fatal and non-fatal shootings between 1980 and 2008".
 
-```{r, echo=FALSE, fig.cap="Map of Crime incidents in Seattle in October 2016", fig.height=14, fig.width=8, message=FALSE, warning=FALSE}
+```{r, echo=FALSE}
 Map2 <- qmap("seattle", zoom = 12, source="google", maptype="roadmap")
 Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title="Population Density", keywidth = 2)) +
   geom_point(data=CrimeOct2016, aes(x=lon, y=lat, colour = factor(Crime)), alpha=0.75, size=1.1) +
@@ -83,13 +80,11 @@ We tested if the our analysis might be skewed due to the jumps from January 2014
 
 Now, a quick look at what the inferential stats say. We can see from Figure XXX that the impact of the *treatment* differs for each of the crime categories differently. It seems that alcohol-related crime is not statistically affected at all by the establishment of a dispensary. Burglary/Theft, property and violent crime, however all seem to be positively impacted by the establishment, whereas marijuana-related crime is substantially smaller and narcotics-related crime somewhat smaller. Other drug-related crime seem to have changed little.
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.cap="Impact of Dispensaries on Crime incident - Mean-difference"}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 p <- cowplot::plot_grid(Box3, Box4, Box5, Box6, Box7, Box8, Box9, labels=c(""))
 title <- ggdraw() + draw_label("Development of Crime per 1000 citizens", fontface="bold")
 cowplot::plot_grid(title, p, ncol = 1, rel_heights = c(0.1, 1)) # rel_heights values control title margins
 ```
-
-Yet, a simple differences in means analysis does not do our question justice. So we are looking at a regression. 
 
 A simple OLS with only our dependent and our treatment variable shows actually that there is a strong positive effect of a dispensary and the crime incident. Remember that our dependent variable is in log-form which means that this equates to a 1.34 percent increase in crime. The variation explained is 17% which is not too bad for a single variable. Yet, if we apply our more rational model of propensity score matching, looking at similar units, we see that the effect drops substantially to only 0.55 percent increase in crime. Yet, still a positive and highly statistically significant effect. If we look, however at the R?-value now, we can see that the variation in crime is no longer explained at all by this variable, thus suggesting that there are other variables that are important.
 
@@ -102,20 +97,6 @@ The Fixed Effects model represented in Table 4 corroborates the idea that the es
 Consistent with our findings, we conclude that the establishment of a marijuana dispensary is positively related with an increase in the crime rate for that district. Perhaps we see this increase because our data spans a shorter time period than the data used in the Cato publication; however, were we to use longitudinal data, for instance, we suspect our outcomes to be consistent with those in the Cato report. One limitation to our research outcomes depends on our chosen variables; had we looked at unemployment as a socio-economic factor affecting crime rates, we might have been able to capture a more complete picture since this data is available month-to-month. In addition to Poverty Rate, Age, and Diversity, we could have used a housing price index similar to the S&P Case-Shiller Home Price Index, which is the market standard in data on U.S. residential real estate prices. Another issue worth mentioning is that burglary/theft, and property and violent crimes might show an upward trend because of other omitted variables; another explanation is that the rises in crime correlate to previous drug sellers being out of a job. This does not seem to be the case, though, given the fact that the trend in the data is so late. Perhaps another variable could have been political leaning, liberal or conservative, but the data we accessed did not specify any such variable. Given our emphasis on districts and geo-spatial data, another concern of ours was the issue of dispensaries “self-selecting” to locate in more suitable districts rather than in those where crime is expected to be higher.
 
 
-## Appendix
-
-```{r, echo=FALSE, fig.cap="A.1 - Development of Crime in Seattle", fig.height=5, fig.width=6}
+```{r, echo=FALSE}
 cowplot::plot_grid(crime.graph, crime.graph.log, labels=c("",""), ncol=1, align="v", label_size = 10, rel_widths = c(1,1))
 ```
-
-```{r, echo=FALSE, fig.cap="A.2 - Distribution of Crime across the Districts", fig.height=3, fig.width=8}
-cowplot::plot_grid(CrimePerThousand, LogCrimePerThousand, labels=c("",""), align="h", label_size = 10, rel_widths = c(1,1))
-```
-
-## References
-
----
-nocite: |
-  @R-RCurl, @R-RJSONIO, @R-gdata, @R-acs, @R-scales, @R-sp, @R-rgdal, @R-maptools, @R-tigris, @R-dplyr, @R-magrittr, @zevross2015
-...
-
