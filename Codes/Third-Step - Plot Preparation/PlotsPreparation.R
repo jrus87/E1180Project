@@ -167,14 +167,14 @@ Crime.lines$log <- log(Crime.lines$CrimePerThousand)
 
 crime.graph <- ggplot(Crime.lines, aes(Month, CrimePerThousand, group=Crime, colour = factor(Crime))) 
 crime.graph <- crime.graph + geom_line() +
-  xlab("Months") + ylab("Crime frequency per 1000 inhabitants") + theme_bw() +
+  xlab("Months") + ylab("Crime per 1,000 citizens") + theme_bw() +
   theme(axis.text.x = element_text(angle=90)) +
   labs(colour = "Crime Categories") +
   ggtitle("Crime rates development in Seattle")
 
 crime.graph.log <- ggplot(Crime.lines, aes(Month, log, group=Crime, colour = factor(Crime))) 
 crime.graph.log <- crime.graph.log + geom_line() +
-  xlab("Months") + ylab("Natural logarithm of Crime Rate per 1000 inhabitants") + theme_bw() +
+  xlab("Months") + ylab("ln(Crime per 1,000 citizens)") + theme_bw() +
   theme(axis.text.x = element_text(angle=90)) +
   labs(colour = "Crime Categories") +
   ggtitle("Crime rates development in Seattle")

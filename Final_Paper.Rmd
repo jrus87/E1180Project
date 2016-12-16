@@ -60,7 +60,9 @@ Let us begin with with simple descriptive statistics. While the 502data is rathe
 source("./Codes/Third-Step - Plot Preparation/PlotsPreparation.R")
 ```
 
-```{r, echo=FALSE, fig.cap="Business Development of Cannabis Production and Sales in Washington State", fig.height=4, fig.width=4}
+\pagebreak
+
+```{r, echo=FALSE, fig.cap="Business Development of Cannabis Production and Sales in Washington State", fig.height=4, fig.width=6}
 cowplot::plot_grid(washington.barplot, washington.barplot.e, labels=c("",""), align="h", label_size = 10, rel_widths = c(1,1))
 ```
 
@@ -75,7 +77,7 @@ It is a fast growing industry and shows increasing interest of buyers. In relati
 
 Table 1 shows the variables used in the next part of our analysis. While Seattle is divided into 132 districts by the U.S. Census, crime incidents only occured in 35 of them once accounting for other NA-related issues with our merged data set. Eight of these 35 districts have a dispensary, which is represented by the *treatment* variable "Established". The dependent variable is the natural logarithm of crime incidents per 1000 inhabitants.^[As a total, as well as for each of the seven different crime categories] The poverty rate, age, diversity and education are socio-economic control variables. Table 1 also indicates how these variables have been operationalised. 
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=FALSE, fig.height=6, results='asis'}
 # change into only Y and X? also time is missing!
 tab <- xtable(Table, caption = "List of dependent and explanatory variables used in analysis")
 print(tab, type="latex", floating=TRUE, latex.environments = "center", comment=FALSE)
@@ -95,6 +97,8 @@ Map2 + scale_fill_gradient2(breaks=pretty_breaks(n=5), guide=guide_legend(title=
 If we look at crime incidents per 1,000 citizens in Figure 3 in the Appendix, then we can see that the development has been different between the different categories. As you can see from Figure 4 in the Appendix, however, only looking at the distribution, however, might be a problem due to the heavy right-tail skewdness. Thus, and in order to make interpretation easier, we will take the natural logarithm. Figure 4 in the Appendix now shows a slightly different picture where most of the crime follows a random walk, i.e. there is change in either direction without there being a trend. Only burglary/theft, property, and violent crime seems to have an upward trend, while other drug related crimes seem to have dropped recently. 
 
 We tested if the our analysis might be skewed due to the jumps from January 2014 to February 2014 that we can see in the Figures in the Appendix. The jumps might be due to coding changes/errors from one year to the next. We have not found any statistical significance. You can find the results in first table of the Appendix. 
+
+\pagebreak
 
 ### Inferential Statistics
 
@@ -118,6 +122,8 @@ stargazer::stargazer(M2, M3,
 ```
 
 A simple OLS with only our dependent and our treatment variable shows actually that there is a strong positive effect of a dispensary and the crime incident. Remember that our dependent variable is in log-form which means that this equates to a 1.34 percent increase in crime. The variation explained is 17% which is not too bad for a single variable. Yet, if we apply our more rational model of propensity score matching, looking at similar units, we see that the effect drops substantially to only 0.55 percent increase in crime. Yet, still a positive and highly statistically significant effect. If we look, however at the R²-value now, we can see that the variation in crime is no longer explained at all by this variable, thus suggesting that there are other variables that are important.
+
+\pagebreak
 
 ```{r, echo=FALSE, fig.height=3.75, fig.width=5, message=FALSE, results="asis", fig.cap="Inferential statistics with covariates"}
 stargazer::stargazer(M4, M5,
@@ -153,17 +159,16 @@ Hello
 
 ## Appendix
 
-```{r, echo=FALSE, fig.cap="A.1 - Crime development in Seattle", fig.height=4, fig.width=6, message=FALSE, warning=FALSE}
-crime.graph
+```{r, echo=FALSE, fig.cap="A.1 - Development of Crime in Seattle", fig.height=5, fig.width=6}
+cowplot::plot_grid(crime.graph, crime.graph.log, labels=c("",""), ncol=1, align="v", label_size = 10, rel_widths = c(1,1))
 ```
 
-```{r, echo=FALSE, fig.cap="A.2 - Distribution of Crime across the Districts", fig.height=4, fig.width=6}
+```{r, echo=FALSE, fig.cap="A.2 - Distribution of Crime across the Districts", fig.height=3, fig.width=8}
 cowplot::plot_grid(CrimePerThousand, LogCrimePerThousand, labels=c("",""), align="h", label_size = 10, rel_widths = c(1,1))
 ```
 
-```{r, echo=FALSE, fig.cap="A.3 - Percentage change Month on Month in Seattle", fig.height=4, fig.width=6, message=FALSE, warning=FALSE}
-crime.graph.log
-```
+\pagebreak
+
 
 ```{r, echo=FALSE, fig.cap="A.4 - t-test with and without January 2014", fig.height=3, fig.width=4, message=FALSE, results="asis"}
 stargazer::stargazer(M1, M1.b,
